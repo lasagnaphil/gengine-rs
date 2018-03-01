@@ -5,7 +5,7 @@ extern crate find_folder;
 use std::mem;
 use std::os::raw::c_void;
 
-use storage::{Storage, Ref};
+use storage::{Storage, ResourceID};
 use shader::Shader;
 use texture::Texture;
 
@@ -15,7 +15,7 @@ use cgmath::{Vector2, Vector3, Matrix4, One};
 pub struct Renderer<'a> {
     shaders: &'a mut Storage<Shader>,
     textures: &'a mut Storage<Texture>,
-    sprite_shader: Ref<Shader>,
+    sprite_shader: ResourceID<Shader>,
     quad_vao: GLuint
 }
 
@@ -72,7 +72,7 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    pub fn draw_texture(&self, texture: Ref<Texture>, pos: Vector2<f32>, size: Vector2<f32>, rotate: GLfloat, color: Vector3<f32>) {
+    pub fn draw_texture(&self, texture: ResourceID<Texture>, pos: Vector2<f32>, size: Vector2<f32>, rotate: GLfloat, color: Vector3<f32>) {
         let shader = self.shaders.get(self.sprite_shader);
         let mut model = Matrix4::<f32>::one();
         model = model * Matrix4::from_translation(Vector3::new(pos.x, pos.y, 0.0));

@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 #[derive(Derivative, PartialEq)]
 #[derivative(Copy(bound=""), Clone(bound=""))]
-pub struct Ref<T> {
+pub struct ResourceID<T> {
     index: u32,
     generation: u16,
     tid: u16,
@@ -82,7 +82,7 @@ impl<T> Storage<T> {
         self.nodes.capacity() as u32
     }
 
-    pub fn insert(&mut self, name: &str, item: T) -> (&T, Ref<T>) {
+    pub fn insert(&mut self, name: &str, item: T) -> (&T, ResourceID<T>) {
         if self.first_available == self.capacity() {
             self.expand();
         }
@@ -104,7 +104,7 @@ impl<T> Storage<T> {
 
             self.name_mappings.insert(name.to_string(), new_index);
 
-            let node_ref = Ref {
+            let node_ref = ResourceID {
                 index: new_index,
                 generation: (*node).generation,
                 tid: 0,
@@ -117,14 +117,14 @@ impl<T> Storage<T> {
         }
     }
 
-    pub fn has(&self, item_ref: Ref<T>) -> bool {
+    pub fn has(&self, item_ref: ResourceID<T>) -> bool {
         unsafe {
             let node = self.get_node(item_ref.index);
             return !(*node).free && (*node).generation == item_ref.generation;
         }
     }
     
-    pub fn get(&self, item_ref: Ref<T>) -> &T {
+    pub fn get(&self, item_ref: ResourceID<T>) -> &T {
         unsafe {
             let node = self.get_node(item_ref.index);
             assert!(!(*node).free);
@@ -134,7 +134,7 @@ impl<T> Storage<T> {
         }
     }
 
-    pub fn get_mut(&mut self, item_ref: Ref<T>) -> &mut T {
+    pub fn get_mut(&mut self, item_ref: ResourceID<T>) -> &mut T {
         unsafe {
             let mut node = self.get_node_mut(item_ref.index);
             assert!(!(*node).free);
@@ -166,12 +166,12 @@ impl<T> Storage<T> {
         }
     }
 
-    pub fn get_ref_by_name(&self, name: &str) -> Option<Ref<T>> {
+    pub fn get_ref_by_name(&self, name: &str) -> Option<ResourceID<T>> {
         self.name_mappings.get(name).map(|index| {
             unsafe {
                 let node = self.get_node(*index);
                 assert!(!(*node).free);
-                return Ref {
+                return ResourceID {
                     index: *index,
                     generation: (*node).generation,
                     tid: 0,
@@ -182,7 +182,7 @@ impl<T> Storage<T> {
 
     }
 
-    pub fn release(&mut self, item_ref: Ref<T>) {
+    pub fn release(&mut self, item_ref: ResourceID<T>) {
         let name = unsafe {
             let node = self.get_node_mut(item_ref.index);
             assert!(!(*node).free);
