@@ -13,6 +13,7 @@ mod shader;
 mod texture;
 mod storage;
 mod renderer;
+mod ecs;
 
 use shader::Shader;
 use texture::{Texture, TextureBuilder};
