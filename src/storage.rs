@@ -310,7 +310,7 @@ mod tests {
             alice_ref
         };
 
-        let invalid_ref = Ref::<TestData1> {
+        let invalid_ref = ResourceID::<TestData1> {
             index: 3,
             generation: 2,
             tid: 0,
