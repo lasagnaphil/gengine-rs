@@ -1,4 +1,4 @@
-use super::get_ctid;
+use super::world::get_ctid;
 
 use std;
 use std::mem;
