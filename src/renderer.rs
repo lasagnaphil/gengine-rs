@@ -8,19 +8,20 @@ use std::os::raw::c_void;
 use storage::{Storage, ResourceID};
 use shader::Shader;
 use texture::Texture;
+use canvas::SpriteData;
 
 use gl::types::*;
 use cgmath::{Vector2, Vector3, Matrix4, One};
 
 pub struct Renderer<'a> {
-    shaders: &'a mut Storage<Shader>,
-    textures: &'a mut Storage<Texture>,
+    shaders: &'a Storage<Shader>,
+    textures: &'a Storage<Texture>,
     sprite_shader: ResourceID<Shader>,
     quad_vao: GLuint
 }
 
 impl<'a> Renderer<'a> {
-    pub fn new(shaders: &'a mut Storage<Shader>, textures: &'a mut Storage<Texture>) -> Self {
+    pub fn new(shaders: &'a Storage<Shader>, textures: &'a Storage<Texture>) -> Self {
         let mut vbo = 0;
         let mut quad_vao = 0;
         let vertices : [f32; 24] = [
@@ -48,14 +49,9 @@ impl<'a> Renderer<'a> {
             gl::BindVertexArray(0);
         }
 
-        let assets = find_folder::Search::ParentsThenKids(3, 3)
-            .for_folder("assets").unwrap();
-        let shader = Shader::compile(
-            assets.join("sprite.vert").to_str().unwrap(), 
-            assets.join("sprite.frag").to_str().unwrap()
-        );
         let sprite_shader_ref = {
-            let (sprite_shader, sprite_shader_ref) = shaders.insert("sprite.shader", shader);
+            let (sprite_shader, sprite_shader_ref) = shaders.get_by_name("sprite.shader").unwrap();
+            let sprite_shader = shaders.get(sprite_shader_ref);
             // TODO: move screen width / height settings to separate file
             let projection_mat = cgmath::ortho(0.0, 800.0, 600.0, 0.0, -1.0, 1.0);
             sprite_shader.use_shader();
@@ -72,8 +68,13 @@ impl<'a> Renderer<'a> {
         }
     }
 
-    pub fn draw_texture(&self, texture: ResourceID<Texture>, pos: Vector2<f32>, size: Vector2<f32>, rotate: GLfloat, color: Vector3<f32>) {
-        let shader = self.shaders.get(self.sprite_shader);
+    pub fn draw_texture(&self, texture_id: ResourceID<Texture>, pos: Vector2<f32>, size: Vector2<f32>, rotate: GLfloat, color: Vector3<f32>) {
+        self.draw_texture_with_shader(self.sprite_shader, texture_id, pos, size, rotate, color);
+    }
+
+    pub fn draw_texture_with_shader(&self, shader_id: ResourceID<Shader>, texture_id: ResourceID<Texture>, pos: Vector2<f32>, size: Vector2<f32>, rotate: GLfloat, color: Vector3<f32>) {
+        let shader = self.shaders.get(shader_id);
+
         let mut model = Matrix4::<f32>::one();
         model = model * Matrix4::from_translation(Vector3::new(pos.x, pos.y, 0.0));
 
@@ -86,9 +87,10 @@ impl<'a> Renderer<'a> {
         shader.set_mat4("model", model);
         shader.set_vec3("spriteColor", color);
 
+        let texture = self.textures.get(texture_id);
         unsafe {
             gl::ActiveTexture(gl::TEXTURE0);
-            self.textures.get(texture).bind();
+            texture.bind();
 
             gl::BindVertexArray(self.quad_vao);
             gl::DrawArrays(gl::TRIANGLES, 0, 6);

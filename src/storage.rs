@@ -12,6 +12,18 @@ pub struct ResourceID<T> {
     phantom: PhantomData<T>
 }
 
+impl ResourceID<T> {
+    #[inline]
+    pub fn null() -> ResourceID<T> {
+        ResourceID {
+            index: u32::max_value(),
+            generation: 0,
+            tid: 0,
+            phantom: PhantomData
+        }
+    }
+}
+
 struct ItemNode<T> {
     item: T,
     next_index: u32,
@@ -144,42 +156,36 @@ impl<T> Storage<T> {
         }
     }
 
-    pub fn get_by_name(&self, name: &str) -> Option<&T> {
+    pub fn get_by_name(&self, name: &str) -> Option<(&T, ResourceID<T>)> {
         self.name_mappings.get(name).map(|index| {
             unsafe {
                 let node = self.get_node(*index);
                 assert!(!(*node).free);
-                return &((*node).item);
-            }
-        })
-    }
-
-    pub fn get_mut_by_name(&mut self, name: &str) -> Option<&mut T> {
-        let index = match self.name_mappings.get(name) {
-                Some(index) => *index,
-                None => { return None; }
-        };
-        unsafe {
-            let mut node = self.get_node_mut(index);
-            assert!(!(*node).free);
-            return Some(&mut ((*node).item));
-        }
-    }
-
-    pub fn get_ref_by_name(&self, name: &str) -> Option<ResourceID<T>> {
-        self.name_mappings.get(name).map(|index| {
-            unsafe {
-                let node = self.get_node(*index);
-                assert!(!(*node).free);
-                return ResourceID {
+                return (&((*node).item), ResourceID {
                     index: *index,
                     generation: (*node).generation,
                     tid: 0,
                     phantom: PhantomData
-                };
+                });
             }
         })
+    }
 
+    pub fn get_mut_by_name(&mut self, name: &str) -> Option<(&mut T, ResourceID<T>)> {
+        let index = match self.name_mappings.get(name) {
+            Some(index) => *index,
+            None => { return None; }
+        };
+        unsafe {
+            let mut node = self.get_node_mut(index);
+            assert!(!(*node).free);
+            return Some((&mut ((*node).item), ResourceID {
+                index: index,
+                generation: (*node).generation,
+                tid: 0,
+                phantom: PhantomData
+            }));
+        }
     }
 
     pub fn release(&mut self, item_ref: ResourceID<T>) {
@@ -336,7 +342,7 @@ mod tests {
     fn test_storage_size() {
         let mut storage = Storage::new(8);
 
-        assert_eq!(storage.size(), 0);
+        assert_eq!(storage.size(), 0);pub const NULL: ResourceID<T> =
         storage.insert("alice", (1, 1.0, "Alice".to_string()));
         assert_eq!(storage.size(), 1);
         storage.insert("bob", (2, 2.0, "Bob".to_string()));

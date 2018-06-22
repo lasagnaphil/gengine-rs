@@ -1,0 +1,11 @@
+title: rpg_sprites
+
+- grass_with_dirt_1: [0, 0, 64, 64]
+- grass_with_dirt_2: [64, 0, 64, 64]
+- grass_with_dirt_3: [128, 0, 64, 64]
+- grass_with_dirt_4: [0, 64, 64, 64]
+- grass_with_dirt_5: [64, 64, 64, 64]
+- grass_with_dirt_6: [128, 64, 64, 64]
+- grass_with_dirt_7: [0, 128, 64, 64]
+- grass_with_dirt_8: [64, 128, 64, 64]
+- grass_with_dirt_9: [128, 128, 64, 64]

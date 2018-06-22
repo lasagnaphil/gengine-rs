@@ -1,0 +1,55 @@
+name = "rpg_sprites"
+
+[grass_with_dirt_1]
+x = 0
+y = 0
+w = 64
+h = 64
+
+[grass_with_dirt_2]
+x = 64
+y = 0
+w = 64
+h = 64
+
+[grass_with_dirt_3]
+x = 128
+y = 0
+w = 64
+h = 64
+
+[grass_with_dirt_4]
+x = 0
+y = 64
+w = 64
+h = 64
+
+[grass_with_dirt_5]
+x = 64
+y = 64
+w = 64
+h = 64
+
+[grass_with_dirt_6]
+x = 128
+y = 64
+w = 64
+h = 64
+
+[grass_with_dirt_7]
+x = 128
+y = 0
+w = 64
+h = 64
+
+[grass_with_dirt_8]
+x = 128
+y = 0
+w = 64
+h = 64
+
+[grass_with_dirt_9]
+x = 128
+y = 0
+w = 64
+h = 64

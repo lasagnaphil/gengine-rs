@@ -13,12 +13,13 @@ mod shader;
 mod texture;
 mod storage;
 mod renderer;
-mod ecs;
+mod canvas;
 
 use shader::Shader;
 use texture::{Texture, TextureBuilder};
 use storage::Storage;
 use renderer::Renderer;
+use canvas::{Canvas, TileMap};
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -62,12 +63,23 @@ fn main() {
     debug_assert_eq!(gl_attr.context_profile(), GLProfile::Core);
     debug_assert_eq!(gl_attr.context_version(), (3, 3));
 
+    let mut textures = Storage::<Texture>::new(16);
+    let mut shaders = Storage::<Shader>::new(16);
+    let mut tilemaps = Storage::<TileMap>::new(4);
 
     let assets = find_folder::Search::ParentsThenKids(3, 3)
         .for_folder("assets").unwrap();
 
-    let mut shaders = Storage::<Shader>::new(16);
-    let mut textures = Storage::<Texture>::new(16);
+
+    let assets = find_folder::Search::ParentsThenKids(3, 3)
+        .for_folder("assets").unwrap();
+
+    let shader = Shader::compile(
+        assets.join("sprite.vert").to_str().unwrap(),
+        assets.join("sprite.frag").to_str().unwrap()
+    );
+    let _ = shaders.insert("sprite.shader", shader);
+
     let test_image = match image::load(assets.join("awesomeface.png").to_str().unwrap()) {
         image::LoadResult::ImageU8(image) => image,
         image::LoadResult::ImageF32(_) => { panic!("Image loaded as f32"); }
@@ -82,6 +94,8 @@ fn main() {
     let (_, test_tex_ref) = textures.insert("awesomeface.texture", test_tex);
 
     let renderer = Renderer::new(&mut shaders, &mut textures);
+
+    let canvas = Canvas::new(&tilemaps, 16, 16, 64, 64);
 
     let mut event_pump = sdl_context.event_pump().unwrap();
 
@@ -103,7 +117,6 @@ fn main() {
             gl::ClearColor(0.5, 0.5, 0.0, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
         }
-
 
         renderer.draw_texture(
             test_tex_ref, 
