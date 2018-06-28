@@ -8,8 +8,8 @@ use std::os::raw::c_void;
 
 pub struct Texture {
     id: GLuint,
-    width: GLint,
-    height: GLint,
+    pub width: GLint,
+    pub height: GLint,
     internal_format: GLint,
     image_format: GLuint,
 

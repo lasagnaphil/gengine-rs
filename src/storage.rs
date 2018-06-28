@@ -1,30 +1,78 @@
 use std;
 use std::mem;
+use std::fmt;
 use std::marker::PhantomData;
 use std::collections::HashMap;
 
-#[derive(Derivative, PartialEq)]
+use serde::ser::{Serialize, Serializer};
+use serde::de::{Deserialize, Deserializer};
+
+pub trait Resource {
+    fn tid() -> u16;
+}
+
+#[derive(Derivative, PartialEq, Debug)]
 #[derivative(Copy(bound=""), Clone(bound=""))]
-pub struct ResourceID<T> {
+#[repr(C)]
+pub struct ResourceID<T: Resource> {
     index: u32,
     generation: u16,
     tid: u16,
     phantom: PhantomData<T>
 }
 
-impl ResourceID<T> {
+impl<T> ResourceID<T> where T: Resource {
     #[inline]
     pub fn null() -> ResourceID<T> {
         ResourceID {
             index: u32::max_value(),
             generation: 0,
-            tid: 0,
+            tid: T::tid(),
             phantom: PhantomData
+        }
+    }
+
+    pub fn is_null(&self) -> bool {
+        self.index == u32::max_value()
+    }
+}
+
+impl<T> Default for ResourceID<T> where T: Resource {
+    fn default() -> Self {
+        ResourceID::<T>::null()
+    }
+}
+
+impl<T> fmt::LowerHex for ResourceID<T> where T: Resource {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        write!(fmt, "{:x}", self)
+    }
+}
+
+impl<T> Serialize for ResourceID<T> where T: Resource {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where S: Serializer,
+    {
+        serializer.serialize_str(&format!("{:x}", self))
+    }
+}
+
+impl<'de, T> Deserialize<'de> for ResourceID<T> where T: Resource {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where D: Deserializer<'de>
+    {
+        use serde::de::Error;
+        let s: &str = Deserialize::deserialize(deserializer)?;
+        let data = u64::from_str_radix(&str::replace(&s[2..], "_", ""), 16).map_err(D::Error::custom)?;
+        unsafe {
+            let rid = mem::transmute::<u64, ResourceID<T>>(data);
+            Ok(rid)
         }
     }
 }
 
-struct ItemNode<T> {
+#[derive(Serialize, Deserialize)]
+struct ItemNode<T: Resource> {
     item: T,
     next_index: u32,
     generation: u16,
@@ -32,7 +80,8 @@ struct ItemNode<T> {
     name: String
 }
 
-pub struct Storage<T> {
+#[derive(Serialize, Deserialize)]
+pub struct Storage<T: Resource> {
     nodes: Vec<ItemNode<T>>,
     size: u32,
 
@@ -42,7 +91,7 @@ pub struct Storage<T> {
 
 static EMPTY_NODE_STR: &'static str = "<empty>";
 
-impl<T> Storage<T> {
+impl<T> Storage<T> where T: Resource {
     pub fn new(capacity: u32) -> Self {
         assert!(capacity > 0);
         let mut nodes = Vec::<ItemNode<T>>::with_capacity(capacity as usize);
@@ -246,7 +295,7 @@ impl<T> Storage<T> {
     }
 }
 
-impl<T> Drop for Storage<T> {
+impl<T> Drop for Storage<T> where T: Resource {
     fn drop(&mut self) {
         unsafe {
             for i in 0..self.capacity() {
@@ -267,9 +316,15 @@ mod tests {
     use self::rand::Rng;
 
     type TestData1 = (i32, f64, String);
+    impl Resource for TestData1 {
+        fn tid() -> u16 { 1 }
+    }
 
     #[derive(Debug)]
     struct TestData2(i32);
+    impl Resource for TestData2 {
+        fn tid() -> u16 { 2 }
+    }
 
     #[test]
     fn test_storage_new() {

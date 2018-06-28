@@ -1,7 +1,3 @@
-extern crate gl;
-extern crate cgmath;
-extern crate find_folder;
-
 use std::mem;
 use std::os::raw::c_void;
 
@@ -10,7 +6,9 @@ use shader::Shader;
 use texture::Texture;
 use canvas::SpriteData;
 
+use gl;
 use gl::types::*;
+use cgmath;
 use cgmath::{Vector2, Vector3, Matrix4, One};
 
 pub struct Renderer<'a> {

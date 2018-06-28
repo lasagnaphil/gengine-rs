@@ -9,17 +9,29 @@ extern crate cgmath;
 extern crate stb_image;
 extern crate find_folder;
 
+extern crate arrayvec;
+
+#[macro_use]
+extern crate serde_derive;
+
+extern crate serde;
+extern crate toml;
+extern crate serde_json;
+
+#[macro_use] mod big_array;
+
 mod shader;
 mod texture;
 mod storage;
 mod renderer;
 mod canvas;
+mod resource_tids;
 
 use shader::Shader;
 use texture::{Texture, TextureBuilder};
 use storage::Storage;
 use renderer::Renderer;
-use canvas::{Canvas, TileMap};
+use canvas::{Canvas, TileMap, SpriteData, SpriteBounds};
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -38,6 +50,23 @@ fn find_sdl_gl_driver() -> Option<u32> {
         }
     }
     None
+}
+
+fn load_image(filename: &str) -> image::Image<u8> {
+    match image::load(filename) {
+        image::LoadResult::ImageU8(image) => image,
+        image::LoadResult::ImageF32(_) => { panic!("Image loaded as f32"); }
+        image::LoadResult::Error(s) => { panic!("Error while loading image: {}", s); }
+    }
+}
+
+fn load_file(filename: &str) -> String {
+    use std::io::Read;
+    let mut file = std::fs::File::open(filename)
+        .expect("file not found");
+    let mut contents = String::new();
+    file.read_to_string(&mut contents);
+    contents
 }
 
 fn main() {
@@ -63,6 +92,7 @@ fn main() {
     debug_assert_eq!(gl_attr.context_profile(), GLProfile::Core);
     debug_assert_eq!(gl_attr.context_version(), (3, 3));
 
+    let mut sprites = Storage::<SpriteData>::new(16);
     let mut textures = Storage::<Texture>::new(16);
     let mut shaders = Storage::<Shader>::new(16);
     let mut tilemaps = Storage::<TileMap>::new(4);
@@ -70,32 +100,46 @@ fn main() {
     let assets = find_folder::Search::ParentsThenKids(3, 3)
         .for_folder("assets").unwrap();
 
-
-    let assets = find_folder::Search::ParentsThenKids(3, 3)
-        .for_folder("assets").unwrap();
-
+    // Load shaders
     let shader = Shader::compile(
         assets.join("sprite.vert").to_str().unwrap(),
         assets.join("sprite.frag").to_str().unwrap()
     );
-    let _ = shaders.insert("sprite.shader", shader);
+    let (_, shader_id) = shaders.insert("sprite.shader", shader);
 
-    let test_image = match image::load(assets.join("awesomeface.png").to_str().unwrap()) {
-        image::LoadResult::ImageU8(image) => image,
-        image::LoadResult::ImageF32(_) => { panic!("Image loaded as f32"); }
-        image::LoadResult::Error(s) => { panic!("Error while loading image: {}", s); }
-    };
+    // Load textures
+    let test_image = load_image(assets.join("awesomeface.png").to_str().unwrap());
     let test_tex = TextureBuilder::new()
         .image_format(gl::RGBA)
         .internal_format(gl::RGBA)
         .image(test_image)
         .build();
-
     let (_, test_tex_ref) = textures.insert("awesomeface.texture", test_tex);
 
-    let renderer = Renderer::new(&mut shaders, &mut textures);
+    let spritesheet_image = load_image(assets.join("kenneyrpgpack/Spritesheet/RPGpack_sheet.png").to_str().unwrap());
+    let spritesheet_tex = TextureBuilder::new()
+        .image_format(gl::RGBA)
+        .internal_format(gl::RGBA)
+        .image(spritesheet_image)
+        .build();
+    let (_, spritesheet_tex_ref) = textures.insert("rpgpack.texture", spritesheet_tex);
 
-    let canvas = Canvas::new(&tilemaps, 16, 16, 64, 64);
+    // Load sprites
+    for i in 0..9 {
+        let name = format!("grass_with_dirt_{}", i+1);
+        sprites.insert(&name, SpriteData {
+            name: name.clone(),
+            texture: spritesheet_tex_ref,
+            rect: SpriteBounds::new((i % 3) * 64, (i / 3) * 64, 64, 64, 0, 0)
+        });
+    }
+
+    let result = serde_json::to_string(&sprites).unwrap();
+    println!("{}", result);
+
+    let renderer = Renderer::new(&shaders, &textures);
+
+    let canvas = Canvas::from_file(&sprites, &textures, &shaders, shader_id, "map_test.json");
 
     let mut event_pump = sdl_context.event_pump().unwrap();
 
@@ -118,6 +162,8 @@ fn main() {
             gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
         }
 
+        canvas.draw();
+        /*
         renderer.draw_texture(
             test_tex_ref, 
             Vector2::new(200.0, 200.0), 
@@ -125,6 +171,7 @@ fn main() {
             45.0,
             Vector3::new(0.0, 1.0, 0.0)
         );
+        */
 
         window.gl_swap_window();
 

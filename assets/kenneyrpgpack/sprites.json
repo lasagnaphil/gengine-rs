@@ -1,0 +1,68 @@
+{
+  "size": 9,
+  "first_available": 0,
+  "nodes": [
+    {
+      "item": {
+        "name": "grass_with_dirt_1",
+        "texture": "0x0002_0001_0000_0001",
+        "rect": [0, 0, 64, 64, 0, 0]
+      }
+    },
+    {
+      "item": {
+        "name": "grass_with_dirt_2",
+        "texture": "0x0002_0001_0000_0001",
+        "rect": [64, 0, 64, 64, 0, 0]
+      }
+    },
+    {
+      "item": {
+        "name": "grass_with_dirt_3",
+        "texture": "0x0002_0001_0000_0001",
+        "rect": [128, 0, 64, 64, 0, 0]
+      }
+    },
+    {
+      "name": "grass_with_dirt_4",
+      "texture": "0x0002_0001_0000_0001",
+      "rect": [0, 64, 64, 64, 0, 0]
+    },
+    {
+      "name": "grass_with_dirt_5",
+      "texture": "0x0002_0001_0000_0001",
+      "rect": [64, 64, 64, 64, 0, 0]
+    },
+    {
+      "name": "grass_with_dirt_6",
+      "texture": "0x0002_0001_0000_0001",
+      "rect": [128, 64, 64, 64, 0, 0]
+    },
+    {
+      "name": "grass_with_dirt_7",
+      "texture": "0x0002_0001_0000_0001",
+      "rect": [0, 128, 64, 64, 0, 0]
+    },
+    {
+      "name": "grass_with_dirt_8",
+      "texture": "0x0002_0001_0000_0001",
+      "rect": [64, 128, 64, 64, 0, 0]
+    },
+    {
+      "name": "grass_with_dirt_9",
+      "texture": "0x0002_0001_0000_0001",
+      "rect": [128, 128, 64, 64, 0, 0]
+    }
+  ],
+  "name_mappings": {
+    "grass_with_dirt_1": "0x0003_0001_0000_0000",
+    "grass_with_dirt_2": "0x0003_0001_0000_0001",
+    "grass_with_dirt_3": "0x0003_0001_0000_0002",
+    "grass_with_dirt_4": "0x0003_0001_0000_0003",
+    "grass_with_dirt_5": "0x0003_0001_0000_0004",
+    "grass_with_dirt_6": "0x0003_0001_0000_0005",
+    "grass_with_dirt_7": "0x0003_0001_0000_0006",
+    "grass_with_dirt_8": "0x0003_0001_0000_0007",
+    "grass_with_dirt_9": "0x0003_0001_0000_0008"
+  }
+}
