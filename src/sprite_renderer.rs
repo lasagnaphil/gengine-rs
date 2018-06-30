@@ -11,14 +11,14 @@ use gl::types::*;
 use cgmath;
 use cgmath::{Vector2, Vector3, Matrix4, One};
 
-pub struct Renderer<'a> {
+pub struct SpriteRenderer<'a> {
     shaders: &'a Storage<Shader>,
     textures: &'a Storage<Texture>,
     sprite_shader: ResourceID<Shader>,
     quad_vao: GLuint
 }
 
-impl<'a> Renderer<'a> {
+impl<'a> SpriteRenderer<'a> {
     pub fn new(shaders: &'a Storage<Shader>, textures: &'a Storage<Texture>) -> Self {
         let mut vbo = 0;
         let mut quad_vao = 0;
@@ -40,25 +40,18 @@ impl<'a> Renderer<'a> {
             gl::BufferData(gl::ARRAY_BUFFER, mem::size_of::<[f32; 24]>() as GLsizeiptr, vertices.as_ptr() as *const c_void, gl::STATIC_DRAW);
 
             gl::BindVertexArray(quad_vao);
+            gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE, 4 * mem::size_of::<f32>() as GLint, 0 as *mut c_void);
             gl::EnableVertexAttribArray(0);
-            gl::VertexAttribPointer(0, 4, gl::FLOAT, gl::FALSE, 4 * mem::size_of::<f32>() as GLint, 0 as *mut c_void);
+            gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE, 4 * mem::size_of::<f32>() as GLint, (2 * mem::size_of::<f32>()) as *mut c_void);
+            gl::EnableVertexAttribArray(1);
 
             gl::BindBuffer(gl::ARRAY_BUFFER, 0);
             gl::BindVertexArray(0);
         }
 
-        let sprite_shader_ref = {
-            let (sprite_shader, sprite_shader_ref) = shaders.get_by_name("sprite.shader").unwrap();
-            let sprite_shader = shaders.get(sprite_shader_ref);
-            // TODO: move screen width / height settings to separate file
-            let projection_mat = cgmath::ortho(0.0, 800.0, 600.0, 0.0, -1.0, 1.0);
-            sprite_shader.use_shader();
-            sprite_shader.set_int("image", 0);
-            sprite_shader.set_mat4("projection", projection_mat);
-            sprite_shader_ref
-        };
+        let (_, sprite_shader_ref) = shaders.get_by_name("sprite.shader").unwrap();
 
-        Renderer {
+        SpriteRenderer {
             shaders: shaders,
             textures: textures,
             sprite_shader: sprite_shader_ref,

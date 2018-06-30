@@ -25,7 +25,7 @@ extern crate serde_json;
 mod shader;
 mod texture;
 mod storage;
-mod renderer;
+mod sprite_renderer;
 mod canvas;
 mod resource_tids;
 
@@ -35,7 +35,7 @@ mod gl;
 use shader::Shader;
 use texture::{Texture, TextureBuilder};
 use storage::Storage;
-use renderer::Renderer;
+use sprite_renderer::SpriteRenderer;
 use canvas::{Canvas, TileMap, SpriteData, SpriteBounds};
 
 use sdl2::event::Event;
@@ -151,6 +151,7 @@ fn main() {
         });
     }
 
+    let sprite_renderer = SpriteRenderer::new(&shaders, &textures);
     let canvas = Canvas::from_file(&sprites, &textures, &shaders, shader_id, "map_test.json");
 
     let mut event_pump = sdl_context.event_pump().unwrap();
@@ -175,15 +176,14 @@ fn main() {
         }
 
         canvas.draw();
-        /*
-        renderer.draw_texture(
+
+        sprite_renderer.draw_texture(
             test_tex_ref, 
             Vector2::new(200.0, 200.0), 
             Vector2::new(300.0, 400.0),
             45.0,
             Vector3::new(0.0, 1.0, 0.0)
         );
-        */
 
         window.gl_swap_window();
 
