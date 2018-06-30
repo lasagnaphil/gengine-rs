@@ -105,6 +105,10 @@ fn main() {
         assets.join("sprite.vert").to_str().unwrap(),
         assets.join("sprite.frag").to_str().unwrap()
     );
+    let projection_mat = cgmath::ortho(0.0, 800.0, 600.0, 0.0, -1.0, 1.0);
+    shader.use_shader();
+    shader.set_int("image", 0);
+    shader.set_mat4("projection", projection_mat);
     let shader_id = shaders.insert("sprite.shader", shader);
 
     // Load textures
@@ -134,10 +138,14 @@ fn main() {
         });
     }
 
-    let result = serde_json::to_string(&sprites).unwrap();
-    println!("{}", result);
+    let result = serde_json::to_string_pretty(&sprites).unwrap();
+    {
+        use std::io::Write;
+        let mut f = std::fs::File::create(assets.join("storage_sprites.json").to_str().unwrap()).unwrap();
+        f.write_all(result.as_bytes());
+    }
 
-    let renderer = Renderer::new(&shaders, &textures);
+    // let renderer = Renderer::new(&shaders, &textures);
 
     let canvas = Canvas::from_file(&sprites, &textures, &shaders, shader_id, "map_test.json");
 

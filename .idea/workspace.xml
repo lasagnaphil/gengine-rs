@@ -11,8 +11,11 @@
   <component name="ChangeListManager">
     <list default="true" id="da760784-d989-48f1-9aa7-1306ce97ed8a" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/sprite.vert" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprite.vert" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/canvas.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/canvas.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/storage.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/texture.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/texture.rs" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -26,26 +29,17 @@
       <file leaf-file-name="renderer.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/renderer.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="192">
-              <caret line="78" column="96" selection-start-line="78" selection-start-column="96" selection-end-line="78" selection-end-column="96" />
+            <state relative-caret-position="-60">
+              <caret line="53" column="53" selection-start-line="53" selection-start-column="53" selection-end-line="53" selection-end-column="53" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="sprites.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/assets/kenneyrpgpack/sprites.json">
+      <file leaf-file-name="canvas.rs" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/canvas.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="64" selection-start-line="64" selection-end-line="64" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="map_test.json" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/assets/map_test.json">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="15">
-              <caret line="21" column="29" selection-start-line="21" selection-start-column="29" selection-end-line="21" selection-end-column="29" />
+            <state relative-caret-position="1422">
+              <caret line="239" column="66" selection-start-line="239" selection-start-column="66" selection-end-line="239" selection-end-column="66" />
             </state>
           </provider>
         </entry>
@@ -53,38 +47,51 @@
       <file leaf-file-name="texture.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/texture.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="85" column="26" selection-start-line="85" selection-start-column="26" selection-end-line="85" selection-end-column="26" />
+            <state relative-caret-position="345">
+              <caret line="77" column="11" selection-start-line="77" selection-start-column="11" selection-end-line="77" selection-end-column="11" />
             </state>
           </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="canvas.rs" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/canvas.rs">
-          <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
       <file leaf-file-name="main.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1439">
-              <caret line="99" column="58" selection-start-line="99" selection-start-column="58" selection-end-line="99" selection-end-column="58" />
+            <state relative-caret-position="162">
+              <caret line="97" column="49" selection-start-line="97" selection-start-column="49" selection-end-line="97" selection-end-column="49" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="storage.rs" pinned="false" current-in-tab="true">
+      <file leaf-file-name="sprite.vert" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/assets/sprite.vert">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="210">
+              <caret line="14" selection-start-line="14" selection-end-line="14" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sprite.frag" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/assets/sprite.frag">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="45">
+              <caret line="3" column="8" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="storage.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/storage.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2490">
-              <caret line="173" column="8" selection-start-line="173" selection-start-column="8" selection-end-line="173" selection-end-column="8" />
+            <state relative-caret-position="365">
+              <caret line="54" selection-start-line="54" selection-end-line="54" />
               <folding>
                 <element signature="e#865#866#0" expanded="true" />
                 <element signature="e#903#904#0" expanded="true" />
-                <element signature="e#3808#3809#0" expanded="true" />
-                <element signature="e#3832#3833#0" expanded="true" />
-                <element signature="e#3869#3870#0" expanded="true" />
-                <element signature="e#3912#3913#0" expanded="true" />
+                <element signature="e#3267#3268#0" expanded="true" />
+                <element signature="e#3291#3292#0" expanded="true" />
+                <element signature="e#3328#3329#0" expanded="true" />
+                <element signature="e#3371#3372#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -111,24 +118,62 @@
         <option value="$PROJECT_DIR$/assets/map_test.toml" />
         <option value="$PROJECT_DIR$/Cargo.toml" />
         <option value="$PROJECT_DIR$/src/big_array.rs" />
-        <option value="$PROJECT_DIR$/src/texture.rs" />
-        <option value="$PROJECT_DIR$/assets/kenneyrpgpack/sprites.json" />
         <option value="$PROJECT_DIR$/assets/map_test.json" />
-        <option value="$PROJECT_DIR$/src/canvas.rs" />
-        <option value="$PROJECT_DIR$/src/main.rs" />
+        <option value="$PROJECT_DIR$/assets/kenneyrpgpack/sprites.json" />
         <option value="$PROJECT_DIR$/src/storage.rs" />
+        <option value="$PROJECT_DIR$/assets/sprite.frag" />
+        <option value="$PROJECT_DIR$/src/main.rs" />
+        <option value="$PROJECT_DIR$/src/texture.rs" />
+        <option value="$PROJECT_DIR$/assets/sprite.vert" />
+        <option value="$PROJECT_DIR$/src/canvas.rs" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="4">
-    <option name="width" value="953" />
+    <option name="width" value="960" />
     <option name="height" value="1049" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="gengine-rs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gengine-rs" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="gengine-rs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gengine-rs" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="gengine-rs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gengine-rs" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+              <item name="kenneyrpgpack" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="gengine-rs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gengine-rs" type="462c0819:PsiDirectoryNode" />
+              <item name="assets" type="462c0819:PsiDirectoryNode" />
+              <item name="kenneyrpgpack" type="462c0819:PsiDirectoryNode" />
+              <item name="Spritesheet" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="gengine-rs" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gengine-rs" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="SearchEverywhereHistoryKey" value="resource&#9;null&#9;null&#10;canvas&#9;FILE&#9;file:///home/lasagnaphil/projects/gengine-rs/src/canvas.rs&#10;main&#9;FILE&#9;file:///home/lasagnaphil/projects/gengine-rs/src/main.rs&#10;mail&#9;null&#9;null&#10;texture&#9;FILE&#9;file:///home/lasagnaphil/projects/gengine-rs/src/texture.rs&#10;main.rs&#9;FILE&#9;file:///home/lasagnaphil/projects/gengine-rs/src/main.rs&#10;main.c&#9;null&#9;null&#10;termi&#9;ACTION&#9;ActivateTerminalToolWindow" />
@@ -154,7 +199,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Cargo Command.Test">
+  <component name="RunManager" selected="Cargo Command.Run">
     <configuration name="Run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="run" />
@@ -187,27 +232,27 @@
       <workItem from="1529657530609" duration="8959000" />
       <workItem from="1530171668431" duration="21349000" />
       <workItem from="1530206521380" duration="4095000" />
-      <workItem from="1530340898625" duration="9279000" />
+      <workItem from="1530340898625" duration="15890000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="50094000" />
+    <option name="totallyTimeSpent" value="56705000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="953" height="1049" extended-state="4" />
+    <frame x="0" y="0" width="960" height="1049" extended-state="4" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.11875" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19665273" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="right" id="Cargo" order="3" />
       <window_info anchor="right" id="LuaJ" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" sideWeight="0.501046" side_tool="true" weight="0.32910052" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32910052" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49895397" visible="true" weight="0.32910052" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49895397" weight="0.32910052" />
       <window_info anchor="bottom" id="Version Control" order="7" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="7" weight="0.32910052" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="7" visible="true" weight="0.32910052" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -250,7 +295,7 @@
           </properties>
         </breakpoint>
       </default-breakpoints>
-      <option name="time" value="11" />
+      <option name="time" value="12" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -292,10 +337,10 @@
           <folding>
             <element signature="e#865#866#0" expanded="true" />
             <element signature="e#903#904#0" expanded="true" />
-            <element signature="e#3808#3809#0" expanded="true" />
-            <element signature="e#3832#3833#0" expanded="true" />
-            <element signature="e#3869#3870#0" expanded="true" />
-            <element signature="e#3912#3913#0" expanded="true" />
+            <element signature="e#3267#3268#0" expanded="true" />
+            <element signature="e#3291#3292#0" expanded="true" />
+            <element signature="e#3328#3329#0" expanded="true" />
+            <element signature="e#3371#3372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -349,10 +394,10 @@
           <folding>
             <element signature="e#865#866#0" expanded="true" />
             <element signature="e#903#904#0" expanded="true" />
-            <element signature="e#3808#3809#0" expanded="true" />
-            <element signature="e#3832#3833#0" expanded="true" />
-            <element signature="e#3869#3870#0" expanded="true" />
-            <element signature="e#3912#3913#0" expanded="true" />
+            <element signature="e#3267#3268#0" expanded="true" />
+            <element signature="e#3291#3292#0" expanded="true" />
+            <element signature="e#3328#3329#0" expanded="true" />
+            <element signature="e#3371#3372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -406,10 +451,10 @@
           <folding>
             <element signature="e#865#866#0" expanded="true" />
             <element signature="e#903#904#0" expanded="true" />
-            <element signature="e#3808#3809#0" expanded="true" />
-            <element signature="e#3832#3833#0" expanded="true" />
-            <element signature="e#3869#3870#0" expanded="true" />
-            <element signature="e#3912#3913#0" expanded="true" />
+            <element signature="e#3267#3268#0" expanded="true" />
+            <element signature="e#3291#3292#0" expanded="true" />
+            <element signature="e#3328#3329#0" expanded="true" />
+            <element signature="e#3371#3372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -442,10 +487,10 @@
           <folding>
             <element signature="e#865#866#0" expanded="true" />
             <element signature="e#903#904#0" expanded="true" />
-            <element signature="e#3808#3809#0" expanded="true" />
-            <element signature="e#3832#3833#0" expanded="true" />
-            <element signature="e#3869#3870#0" expanded="true" />
-            <element signature="e#3912#3913#0" expanded="true" />
+            <element signature="e#3267#3268#0" expanded="true" />
+            <element signature="e#3291#3292#0" expanded="true" />
+            <element signature="e#3328#3329#0" expanded="true" />
+            <element signature="e#3371#3372#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -532,27 +577,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/assets/map_test.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="21" column="29" selection-start-line="21" selection-start-column="29" selection-end-line="21" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/assets/kenneyrpgpack/sprites.json">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="510">
-          <caret line="64" selection-start-line="64" selection-end-line="64" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/renderer.rs">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="78" column="96" selection-start-line="78" selection-start-column="96" selection-end-line="78" selection-end-column="96" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/.cargo/registry/src/github.com-1ecc6299db9ec823/serde-1.0.66/src/ser/mod.rs">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="202">
@@ -560,35 +584,87 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/texture.rs">
+    <entry file="file://$PROJECT_DIR$/assets/storage_sprites.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="85" column="26" selection-start-line="85" selection-start-column="26" selection-end-line="85" selection-end-column="26" />
+        <state relative-caret-position="-2553">
+          <caret line="8" column="11" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="11" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/canvas.rs">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main.rs">
+    <entry file="file://$PROJECT_DIR$/assets/kenneyrpgpack/sprites.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1439">
-          <caret line="99" column="58" selection-start-line="99" selection-start-column="58" selection-end-line="99" selection-end-column="58" />
+        <state relative-caret-position="567">
+          <caret line="58" column="40" selection-start-line="58" selection-start-column="40" selection-end-line="58" selection-end-column="40" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/map_test.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="21" column="29" selection-start-line="21" selection-start-column="29" selection-end-line="21" selection-end-column="29" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/storage.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2490">
-          <caret line="173" column="8" selection-start-line="173" selection-start-column="8" selection-end-line="173" selection-end-column="8" />
+        <state relative-caret-position="365">
+          <caret line="54" selection-start-line="54" selection-end-line="54" />
           <folding>
             <element signature="e#865#866#0" expanded="true" />
             <element signature="e#903#904#0" expanded="true" />
-            <element signature="e#3808#3809#0" expanded="true" />
-            <element signature="e#3832#3833#0" expanded="true" />
-            <element signature="e#3869#3870#0" expanded="true" />
-            <element signature="e#3912#3913#0" expanded="true" />
+            <element signature="e#3267#3268#0" expanded="true" />
+            <element signature="e#3291#3292#0" expanded="true" />
+            <element signature="e#3328#3329#0" expanded="true" />
+            <element signature="e#3371#3372#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/sprite.frag">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="45">
+          <caret line="3" column="8" selection-start-line="3" selection-start-column="8" selection-end-line="3" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/texture.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="345">
+          <caret line="77" column="11" selection-start-line="77" selection-start-column="11" selection-end-line="77" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/renderer.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-60">
+          <caret line="53" column="53" selection-start-line="53" selection-start-column="53" selection-end-line="53" selection-end-column="53" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/awesomeface.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/kenneyrpgpack/Spritesheet/RPGpack_sheet.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="162">
+          <caret line="97" column="49" selection-start-line="97" selection-start-column="49" selection-end-line="97" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/assets/sprite.vert">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" selection-start-line="14" selection-end-line="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/canvas.rs">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1422">
+          <caret line="239" column="66" selection-start-line="239" selection-start-column="66" selection-end-line="239" selection-end-column="66" />
         </state>
       </provider>
     </entry>

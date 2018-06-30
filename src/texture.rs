@@ -69,12 +69,13 @@ impl TextureBuilder {
         unsafe {
             gl::GenTextures(1, &mut id);
             gl::BindTexture(gl::TEXTURE_2D, id);
-            gl::TexImage2D(gl::TEXTURE_2D, 0, self.internal_format, self.width, self.height, 0, self.image_format, gl::UNSIGNED_BYTE, self.data.as_mut_ptr() as *mut c_void);
-            
+
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, self.wrap_s);
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, self.wrap_s);
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, self.filter_min);
             gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, self.filter_max);
+
+            gl::TexImage2D(gl::TEXTURE_2D, 0, self.internal_format, self.width, self.height, 0, self.image_format, gl::UNSIGNED_BYTE, self.data.as_mut_ptr() as *mut c_void);
         }
 
         Texture {

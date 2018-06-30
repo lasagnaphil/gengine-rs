@@ -82,7 +82,7 @@ pub struct TileMap {
 pub const MAX_LAYERS: usize = 4;
 pub const MAX_WIDTH: usize = 64;
 pub const MAX_HEIGHT: usize = 64;
-pub const SCALE: f32 = 1.0/16.0;
+pub const SCALE: f32 = 64.0;
 
 #[derive(Serialize, Deserialize)]
 struct TileMapLayerData(
@@ -126,7 +126,8 @@ pub struct Canvas<'a> {
 
     default_shader: ResourceID<Shader>,
 
-    vbos: ArrayVec<[GLuint; MAX_LAYERS]>,
+    pos_vbos: ArrayVec<[GLuint; MAX_LAYERS]>,
+    uv_vbos: ArrayVec<[GLuint; MAX_LAYERS]>,
     vaos: ArrayVec<[GLuint; MAX_LAYERS]>,
     ebo: GLuint
 }
@@ -164,12 +165,12 @@ impl<'a> Canvas<'a> {
         for i in 0..MAX_WIDTH*MAX_HEIGHT {
             vertices[8*i] = (i % MAX_WIDTH) as f32 * SCALE;
             vertices[8*i + 1] = (i / MAX_WIDTH) as f32 * SCALE;
-            vertices[8*i + 2] = (i % MAX_WIDTH) as f32 * SCALE;
+            vertices[8*i + 2] = ((i % MAX_WIDTH) + 1) as f32 * SCALE;
             vertices[8*i + 3] = (i / MAX_WIDTH) as f32 * SCALE;
-            vertices[8*i + 4] = (i % MAX_WIDTH) as f32 * SCALE;
-            vertices[8*i + 5] = (i / MAX_WIDTH) as f32 * SCALE;
+            vertices[8*i + 4] = ((i % MAX_WIDTH) + 1) as f32 * SCALE;
+            vertices[8*i + 5] = ((i / MAX_WIDTH) + 1) as f32 * SCALE;
             vertices[8*i + 6] = (i % MAX_WIDTH) as f32 * SCALE;
-            vertices[8*i + 7] = (i / MAX_WIDTH) as f32 * SCALE;
+            vertices[8*i + 7] = ((i / MAX_WIDTH) + 1) as f32 * SCALE;
         }
 
         let mut uvs: [[f32; 8*MAX_WIDTH*MAX_HEIGHT]; MAX_LAYERS] =
@@ -204,7 +205,8 @@ impl<'a> Canvas<'a> {
             indices[6*i+5] = (4*i + 3) as u32;
         }
 
-        let mut vbos = ArrayVec::<[GLuint; MAX_LAYERS]>::new();
+        let mut pos_vbos = ArrayVec::<[GLuint; MAX_LAYERS]>::new();
+        let mut uv_vbos = ArrayVec::<[GLuint; MAX_LAYERS]>::new();
         let mut vaos = ArrayVec::<[GLuint; MAX_LAYERS]>::new();
         let mut ebo = 0;
 
@@ -213,37 +215,48 @@ impl<'a> Canvas<'a> {
             gl::GenBuffers(1, &mut ebo);
             for i in 0..num_layers {
                 let mut vao = 0;
-                let mut vbo = 0;
+                let mut pos_vbo = 0;
+                let mut uv_vbo = 0;
                 gl::GenVertexArrays(1, &mut vao);
-                gl::GenBuffers(1, &mut vbo);
+                gl::GenBuffers(1, &mut pos_vbo);
+                gl::GenBuffers(1, &mut uv_vbo);
                 vaos.push(vao);
-                vbos.push(vbo);
+                pos_vbos.push(pos_vbo);
+                uv_vbos.push(uv_vbo);
             }
+
+            gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
+            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
+                           (6*MAX_WIDTH*MAX_HEIGHT*mem::size_of::<f32>()) as GLsizeiptr,
+                           indices.as_ptr() as *const c_void,
+                           gl::STATIC_DRAW);
 
             // Bind vbos and ebo to vaos
             for i in 0..num_layers {
                 gl::BindVertexArray(vaos[i]);
 
-                gl::BindBuffer(gl::ARRAY_BUFFER, vbos[i]);
+                gl::BindBuffer(gl::ARRAY_BUFFER, pos_vbos[i]);
                 gl::BufferData(gl::ARRAY_BUFFER,
-                               mem::size_of_val(&vertices[i]) as GLsizeiptr, vertices.as_ptr() as *const c_void,
-                               gl::STATIC_DRAW);
-                gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
-                gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
-                               mem::size_of_val(&indices) as GLsizeiptr, indices.as_ptr() as *const c_void,
+                               (8*MAX_WIDTH*MAX_HEIGHT*mem::size_of::<f32>()) as GLsizeiptr,
+                               vertices.as_ptr() as *const c_void,
                                gl::STATIC_DRAW);
                 gl::VertexAttribPointer(0, 2, gl::FLOAT, gl::FALSE,
-                                        4 * mem::size_of::<f32>() as GLint, 0 as *const c_void);
-                gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE,
-                                        4 * mem::size_of::<f32>() as GLint, (2 * mem::size_of::<f32>()) as *const c_void);
+                                        0 as GLint, 0 as *const c_void);
                 gl::EnableVertexAttribArray(0);
+
+                gl::BindBuffer(gl::ARRAY_BUFFER, uv_vbos[i]);
+                gl::BufferData(gl::ARRAY_BUFFER,
+                               (8*MAX_WIDTH*MAX_HEIGHT*mem::size_of::<f32>()) as GLsizeiptr,
+                               uvs.as_ptr() as *const c_void,
+                               gl::STATIC_DRAW);
+
+                gl::VertexAttribPointer(1, 2, gl::FLOAT, gl::FALSE,
+                                        0 as GLint, 0 as *const c_void);
                 gl::EnableVertexAttribArray(1);
+
+                gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
             }
 
-            gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
-            gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
-                           mem::size_of_val(&indices) as GLsizeiptr, indices.as_ptr() as *const c_void,
-                           gl::STATIC_DRAW);
         }
 
         Canvas {
@@ -267,7 +280,8 @@ impl<'a> Canvas<'a> {
             shaders,
             default_shader,
 
-            vbos,
+            pos_vbos,
+            uv_vbos,
             vaos,
             ebo
         }
@@ -275,6 +289,7 @@ impl<'a> Canvas<'a> {
 
     pub fn draw(&self) {
         let shader = self.shaders.get(self.default_shader);
+        shader.use_shader();
         shader.set_mat4("model", Matrix4::<f32>::one());
         shader.set_vec3("spriteColor", Vector3::<f32>::new(1.0, 1.0, 1.0));
 
@@ -287,7 +302,8 @@ impl<'a> Canvas<'a> {
                 texture.bind();
 
                 gl::BindVertexArray(self.vaos[layer_idx]);
-                gl::DrawArrays(gl::TRIANGLES, 0, (4 * MAX_WIDTH * MAX_HEIGHT) as GLint);
+                gl::DrawElements(gl::TRIANGLES, (6 * MAX_WIDTH * MAX_HEIGHT) as GLint, gl::UNSIGNED_INT, 0 as *const c_void);
+                gl::BindVertexArray(0);
             }
         }
     }

@@ -43,17 +43,13 @@ impl<T> Default for ResourceID<T> where T: Resource {
     }
 }
 
-impl<T> fmt::LowerHex for ResourceID<T> where T: Resource {
-    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-        write!(fmt, "{:x}", self)
-    }
-}
-
 impl<T> Serialize for ResourceID<T> where T: Resource {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where S: Serializer,
     {
-        serializer.serialize_str(&format!("{:x}", self))
+        unsafe {
+            serializer.serialize_str(&format!("{:#018x}", mem::transmute_copy::<Self, u64>(self)))
+        }
     }
 }
 
