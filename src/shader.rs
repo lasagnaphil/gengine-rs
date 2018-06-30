@@ -73,6 +73,8 @@ impl Shader {
                 gl::GetProgramInfoLog(program, 512, ptr::null_mut(), info_log.as_mut_ptr() as *mut GLchar);
                 panic!("{}", str::from_utf8(info_log.as_slice()).ok().expect("PrograminfoLog not valid utf8"));
             }
+            gl::DeleteShader(vertex_shader_id);
+            gl::DeleteShader(fragment_shader_id);
         }
 
         Shader {

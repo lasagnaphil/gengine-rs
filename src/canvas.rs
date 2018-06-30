@@ -8,7 +8,6 @@ use std::collections::HashMap;
 use std::marker::PhantomData;
 
 use arrayvec::ArrayVec;
-use big_array;
 use big_array::BigArray;
 
 use toml;
@@ -305,6 +304,19 @@ impl<'a> Canvas<'a> {
                 gl::DrawElements(gl::TRIANGLES, (6 * MAX_WIDTH * MAX_HEIGHT) as GLint, gl::UNSIGNED_INT, 0 as *const c_void);
                 gl::BindVertexArray(0);
             }
+        }
+    }
+}
+
+impl<'a> Drop for Canvas<'a> {
+    fn drop(&mut self) {
+        unsafe {
+            for i in 0..self.num_layers {
+                gl::DeleteVertexArrays(1, &self.vaos[i]);
+                gl::DeleteBuffers(1, &self.pos_vbos[i]);
+                gl::DeleteBuffers(1, &self.uv_vbos[i]);
+            }
+            gl::DeleteBuffers(1, &self.ebo);
         }
     }
 }

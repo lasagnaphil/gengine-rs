@@ -69,6 +69,12 @@ fn load_file(filename: &str) -> String {
     contents
 }
 
+fn save_file(filename: &str, content: &[u8]) {
+    use std::io::Write;
+    let mut f = std::fs::File::create(filename).unwrap();
+    f.write_all(content);
+}
+
 fn main() {
     let sdl_context = sdl2::init().unwrap();
     let video_subsystem = sdl_context.video().unwrap();
@@ -137,15 +143,6 @@ fn main() {
             rect: SpriteBounds::new((i % 3) * 64, (i / 3) * 64, 64, 64, 0, 0)
         });
     }
-
-    let result = serde_json::to_string_pretty(&sprites).unwrap();
-    {
-        use std::io::Write;
-        let mut f = std::fs::File::create(assets.join("storage_sprites.json").to_str().unwrap()).unwrap();
-        f.write_all(result.as_bytes());
-    }
-
-    // let renderer = Renderer::new(&shaders, &textures);
 
     let canvas = Canvas::from_file(&sprites, &textures, &shaders, shader_id, "map_test.json");
 
