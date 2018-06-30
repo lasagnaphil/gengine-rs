@@ -1,7 +1,4 @@
-extern crate gl;
-extern crate cgmath;
-extern crate stb_image;
-
+use gl;
 use gl::types::*;
 use stb_image::image::Image;
 use std::os::raw::c_void;

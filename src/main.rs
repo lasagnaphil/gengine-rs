@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
-extern crate gl;
+// #[cfg(use_gl_crate)]
+// extern crate gl;
 
 #[macro_use]
 extern crate derivative;
@@ -27,6 +28,9 @@ mod storage;
 mod renderer;
 mod canvas;
 mod resource_tids;
+
+#[cfg(not(use_gl_crate))]
+mod gl;
 
 use shader::Shader;
 use texture::{Texture, TextureBuilder};

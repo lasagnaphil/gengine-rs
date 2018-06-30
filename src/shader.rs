@@ -1,6 +1,3 @@
-extern crate gl;
-extern crate cgmath;
-
 use std::ffi::CString;
 use std::ptr;
 use std::str;
@@ -8,6 +5,7 @@ use std::str;
 use std::fs::File;
 use std::io::prelude::*;
 
+use gl;
 use gl::types::*;
 
 use cgmath::{Matrix4, Vector3};
