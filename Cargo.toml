@@ -4,8 +4,7 @@ version = "0.1.0"
 authors = ["Phillip Chang <lasagnaphil@snu.ac.kr>"]
 
 [dependencies]
-sdl2 = "0.31.0"
-gl = "0.6.0"
+gl = { path = "lib/gl" }
 libc = "0.2"
 cgmath = "0.16.0"
 stb_image = "0.2.2"
@@ -21,3 +20,7 @@ toml = "0.4"
 version = "0.4.7"
 default-features = false
 features = ["serde-1"]
+
+[dependencies.sdl2]
+version = "0.31.0"
+default-features = false

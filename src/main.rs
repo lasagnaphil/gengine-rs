@@ -1,9 +1,10 @@
 #![allow(dead_code)]
 
+extern crate gl;
+
 #[macro_use]
 extern crate derivative;
 
-extern crate gl;
 extern crate sdl2;
 extern crate cgmath;
 extern crate stb_image;
@@ -89,9 +90,11 @@ fn main() {
         .build()
         .unwrap();
 
-    let mut canvas = window
+    let ctx = window
         .gl_create_context()
         .unwrap();
+
+    window.gl_make_current(&ctx);
 
     gl::load_with(|name| video_subsystem.gl_get_proc_address(name) as *const _);
 
