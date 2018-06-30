@@ -4,8 +4,8 @@ use std::fmt;
 use std::marker::PhantomData;
 use std::collections::HashMap;
 
-use serde::ser::{Serialize, Serializer};
-use serde::de::{Deserialize, Deserializer};
+use serde::ser::{Serialize, Serializer, SerializeSeq};
+use serde::de::{Deserialize, Deserializer, Visitor, SeqAccess};
 
 pub trait Resource {
     fn tid() -> u16;
@@ -80,8 +80,73 @@ struct ItemNode<T: Resource> {
     name: String
 }
 
+fn serialize_nodes<T, S>(nodes: &Vec<ItemNode<T>>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    T: Resource + Serialize, S: Serializer
+{
+    let capacity = nodes.capacity();
+    let mut seq = serializer.serialize_seq(Some(capacity))?;
+    unsafe {
+        for i in 0..capacity {
+            let node_ptr = nodes.as_ptr().offset(i as isize);
+            if (*node_ptr).generation > 0 {
+                seq.serialize_element(&*node_ptr);
+            }
+            else {
+                seq.serialize_element(&None);
+            }
+        }
+    }
+    seq.end()
+}
+
+fn deserialize_nodes<'de, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+    T: Resource + Deserialize<'de>, D: Deserializer<'de>
+{
+    struct NodesVisitor<T>(PhantomData<fn() -> T>);
+
+    impl<'de, T> Visitor<'de> for NodesVisitor<T> where T: Resource {
+        type Value = Vec<ItemNode<T>>;
+
+        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
+            formatter.write_str("storage nodes array invalid")
+        }
+
+        fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
+        where A: SeqAccess<'de>
+        {
+            let capacity = seq.size_hint()?;
+            let mut nodes = Vec::<ItemNode<T>>::with_capacity(capacity);
+
+            for i in 0..capacity {
+                let elem = seq.next_element()?;
+                unsafe {
+                    let node_ptr = nodes.as_mut_ptr().offset(i as isize);
+                    match elem {
+                        Some(elem) => {
+                            std::ptr::write(node_ptr, elem);
+                        }
+                        None => {
+                            std::ptr::write(node_ptr, ItemNode {
+                                item: mem::uninitialized(),
+                                next_index: (i + 1) as u32,
+                                generation: 0,
+                                free: true,
+                                name: String::from(EMPTY_NODE_STR)
+                            });
+                        }
+                    }
+                }
+            }
+            Ok(nodes)
+        }
+    }
+    deserializer.deserialize_any(NodesVisitor(PhantomData))
+}
 #[derive(Serialize, Deserialize)]
 pub struct Storage<T: Resource> {
+    #[serde(serialize_with = "serialize_nodes", deserialize_with = "deserialize_nodes")]
     nodes: Vec<ItemNode<T>>,
     size: u32,
 
