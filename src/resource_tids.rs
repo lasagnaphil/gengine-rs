@@ -1,7 +1,7 @@
 use super::storage::Resource;
 use super::shader::Shader;
 use super::texture::Texture;
-use super::canvas::SpriteData;
+use super::sprite::SpriteData;
 use super::canvas::TileMap;
 
 impl Resource for Shader {

@@ -28,6 +28,7 @@ mod storage;
 mod sprite_renderer;
 mod canvas;
 mod resource_tids;
+mod sprite;
 
 #[cfg(not(use_gl_crate))]
 mod gl;
@@ -36,7 +37,8 @@ use shader::Shader;
 use texture::{Texture, TextureBuilder};
 use storage::Storage;
 use sprite_renderer::SpriteRenderer;
-use canvas::{Canvas, TileMap, SpriteData, SpriteBounds};
+use canvas::{Canvas, TileMap};
+use sprite::{SpriteData, SpriteBounds};
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -151,7 +153,13 @@ fn main() {
         });
     }
 
-    let sprite_renderer = SpriteRenderer::new(&shaders, &textures);
+    let sprite_id = sprites.insert("smiley_face", SpriteData {
+        name: "smiley_face".to_string(),
+        texture: test_tex_ref,
+        rect: SpriteBounds::new(64, 64, 384, 384, 0, 0)
+    });
+
+    let sprite_renderer = SpriteRenderer::new(&shaders, &textures, &sprites);
     let canvas = Canvas::from_file(&sprites, &textures, &shaders, shader_id, "map_test.json");
 
     let mut event_pump = sdl_context.event_pump().unwrap();
@@ -177,9 +185,17 @@ fn main() {
 
         canvas.draw();
 
-        sprite_renderer.draw_texture(
-            test_tex_ref, 
-            Vector2::new(200.0, 200.0), 
+        sprite_renderer.draw_sprite(
+            sprite_id,
+            Vector2::new(100.0, 100.0),
+            Vector2::new(200.0, 200.0),
+            0.0,
+            Vector3::new(0.0, 1.0, 0.0)
+        );
+
+        sprite_renderer.draw_sprite(
+            sprite_id,
+            Vector2::new(200.0, 200.0),
             Vector2::new(300.0, 400.0),
             45.0,
             Vector3::new(0.0, 1.0, 0.0)
