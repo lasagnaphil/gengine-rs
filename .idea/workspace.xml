@@ -11,6 +11,7 @@
   <component name="ChangeListManager">
     <list default="true" id="da760784-d989-48f1-9aa7-1306ce97ed8a" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/storage.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/storage.rs" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -66,8 +67,8 @@
       <file leaf-file-name="main.rs" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="282">
-              <caret line="163" selection-start-line="163" selection-end-line="163" />
+            <state relative-caret-position="1439">
+              <caret line="99" column="58" selection-start-line="99" selection-start-column="58" selection-end-line="99" selection-end-column="58" />
             </state>
           </provider>
         </entry>
@@ -75,8 +76,8 @@
       <file leaf-file-name="storage.rs" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/storage.rs">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1260">
-              <caret line="91" column="35" lean-forward="true" selection-start-line="91" selection-start-column="35" selection-end-line="91" selection-end-column="35" />
+            <state relative-caret-position="2490">
+              <caret line="173" column="8" selection-start-line="173" selection-start-column="8" selection-end-line="173" selection-end-column="8" />
               <folding>
                 <element signature="e#865#866#0" expanded="true" />
                 <element signature="e#903#904#0" expanded="true" />
@@ -113,14 +114,14 @@
         <option value="$PROJECT_DIR$/src/texture.rs" />
         <option value="$PROJECT_DIR$/assets/kenneyrpgpack/sprites.json" />
         <option value="$PROJECT_DIR$/assets/map_test.json" />
-        <option value="$PROJECT_DIR$/src/main.rs" />
         <option value="$PROJECT_DIR$/src/canvas.rs" />
+        <option value="$PROJECT_DIR$/src/main.rs" />
         <option value="$PROJECT_DIR$/src/storage.rs" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds" extendedState="4">
-    <option name="width" value="960" />
+    <option name="width" value="953" />
     <option name="height" value="1049" />
   </component>
   <component name="ProjectView">
@@ -153,7 +154,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Cargo Command.Run">
+  <component name="RunManager" selected="Cargo Command.Test">
     <configuration name="Run" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="channel" value="DEFAULT" />
       <option name="command" value="run" />
@@ -186,15 +187,15 @@
       <workItem from="1529657530609" duration="8959000" />
       <workItem from="1530171668431" duration="21349000" />
       <workItem from="1530206521380" duration="4095000" />
-      <workItem from="1530340898625" duration="4277000" />
+      <workItem from="1530340898625" duration="9279000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45092000" />
+    <option name="totallyTimeSpent" value="50094000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="960" height="1049" extended-state="4" />
+    <frame x="0" y="0" width="953" height="1049" extended-state="4" />
     <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" weight="0.11875" />
@@ -571,15 +572,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="282">
-          <caret line="163" selection-start-line="163" selection-end-line="163" />
+        <state relative-caret-position="1439">
+          <caret line="99" column="58" selection-start-line="99" selection-start-column="58" selection-end-line="99" selection-end-column="58" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/storage.rs">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1260">
-          <caret line="91" column="35" lean-forward="true" selection-start-line="91" selection-start-column="35" selection-end-line="91" selection-end-column="35" />
+        <state relative-caret-position="2490">
+          <caret line="173" column="8" selection-start-line="173" selection-start-column="8" selection-end-line="173" selection-end-column="8" />
           <folding>
             <element signature="e#865#866#0" expanded="true" />
             <element signature="e#903#904#0" expanded="true" />

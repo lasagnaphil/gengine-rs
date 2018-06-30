@@ -105,7 +105,7 @@ fn main() {
         assets.join("sprite.vert").to_str().unwrap(),
         assets.join("sprite.frag").to_str().unwrap()
     );
-    let (_, shader_id) = shaders.insert("sprite.shader", shader);
+    let shader_id = shaders.insert("sprite.shader", shader);
 
     // Load textures
     let test_image = load_image(assets.join("awesomeface.png").to_str().unwrap());
@@ -114,7 +114,7 @@ fn main() {
         .internal_format(gl::RGBA)
         .image(test_image)
         .build();
-    let (_, test_tex_ref) = textures.insert("awesomeface.texture", test_tex);
+    let test_tex_ref = textures.insert("awesomeface.texture", test_tex);
 
     let spritesheet_image = load_image(assets.join("kenneyrpgpack/Spritesheet/RPGpack_sheet.png").to_str().unwrap());
     let spritesheet_tex = TextureBuilder::new()
@@ -122,7 +122,7 @@ fn main() {
         .internal_format(gl::RGBA)
         .image(spritesheet_image)
         .build();
-    let (_, spritesheet_tex_ref) = textures.insert("rpgpack.texture", spritesheet_tex);
+    let spritesheet_tex_ref = textures.insert("rpgpack.texture", spritesheet_tex);
 
     // Load sprites
     for i in 0..9 {

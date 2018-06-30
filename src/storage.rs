@@ -73,80 +73,14 @@ impl<'de, T> Deserialize<'de> for ResourceID<T> where T: Resource {
 
 #[derive(Serialize, Deserialize)]
 struct ItemNode<T: Resource> {
-    item: T,
+    item: Option<T>,
     next_index: u32,
     generation: u16,
-    free: bool,
     name: String
 }
 
-fn serialize_nodes<T, S>(nodes: &Vec<ItemNode<T>>, serializer: S) -> Result<S::Ok, S::Error>
-where
-    T: Resource + Serialize, S: Serializer
-{
-    let capacity = nodes.capacity();
-    let mut seq = serializer.serialize_seq(Some(capacity))?;
-    unsafe {
-        for i in 0..capacity {
-            let node_ptr = nodes.as_ptr().offset(i as isize);
-            if (*node_ptr).generation > 0 {
-                seq.serialize_element(&*node_ptr);
-            }
-            else {
-                seq.serialize_element(&None);
-            }
-        }
-    }
-    seq.end()
-}
-
-fn deserialize_nodes<'de, T, D>(deserializer: D) -> Result<T, D::Error>
-where
-    T: Resource + Deserialize<'de>, D: Deserializer<'de>
-{
-    struct NodesVisitor<T>(PhantomData<fn() -> T>);
-
-    impl<'de, T> Visitor<'de> for NodesVisitor<T> where T: Resource {
-        type Value = Vec<ItemNode<T>>;
-
-        fn expecting(&self, formatter: &mut fmt::Formatter) -> fmt::Result {
-            formatter.write_str("storage nodes array invalid")
-        }
-
-        fn visit_seq<A>(self, mut seq: A) -> Result<Self::Value, A::Error>
-        where A: SeqAccess<'de>
-        {
-            let capacity = seq.size_hint()?;
-            let mut nodes = Vec::<ItemNode<T>>::with_capacity(capacity);
-
-            for i in 0..capacity {
-                let elem = seq.next_element()?;
-                unsafe {
-                    let node_ptr = nodes.as_mut_ptr().offset(i as isize);
-                    match elem {
-                        Some(elem) => {
-                            std::ptr::write(node_ptr, elem);
-                        }
-                        None => {
-                            std::ptr::write(node_ptr, ItemNode {
-                                item: mem::uninitialized(),
-                                next_index: (i + 1) as u32,
-                                generation: 0,
-                                free: true,
-                                name: String::from(EMPTY_NODE_STR)
-                            });
-                        }
-                    }
-                }
-            }
-            Ok(nodes)
-        }
-    }
-    deserializer.deserialize_any(NodesVisitor(PhantomData))
-}
 #[derive(Serialize, Deserialize)]
 pub struct Storage<T: Resource> {
-    #[serde(serialize_with = "serialize_nodes", deserialize_with = "deserialize_nodes")]
     nodes: Vec<ItemNode<T>>,
     size: u32,
 
@@ -160,17 +94,13 @@ impl<T> Storage<T> where T: Resource {
     pub fn new(capacity: u32) -> Self {
         assert!(capacity > 0);
         let mut nodes = Vec::<ItemNode<T>>::with_capacity(capacity as usize);
-        unsafe {
-            for i in 0..capacity {
-                let node = nodes.as_mut_ptr().offset(i as isize);
-                std::ptr::write(node, ItemNode {
-                    item: mem::uninitialized(),
-                    next_index: (i + 1) as u32,
-                    generation: 0,
-                    free: true,
-                    name: String::from(EMPTY_NODE_STR)
-                });
-            }
+        for i in 0..capacity {
+            nodes.push(ItemNode {
+                item: None,
+                next_index: (i + 1) as u32,
+                generation: 0,
+                name: String::from(EMPTY_NODE_STR)
+            });
         }
         Storage {
             nodes: nodes,
@@ -182,22 +112,15 @@ impl<T> Storage<T> where T: Resource {
 
     fn expand(&mut self) {
         let capacity = self.capacity();
-        let new_capacity = capacity * 2;
-        let mut new_nodes = Vec::with_capacity(new_capacity as usize);
-        unsafe {
-            std::ptr::copy(self.nodes.as_ptr(), new_nodes.as_mut_ptr(), capacity as usize);
-            for i in capacity..new_capacity {
-                let node = new_nodes.as_mut_ptr().offset(i as isize);
-                std::ptr::write(node, ItemNode {
-                    item: mem::uninitialized(),
-                    next_index: i + 1,
-                    generation: 0,
-                    free: true,
-                    name: String::from(EMPTY_NODE_STR)
-                });
-            }
+        self.nodes.reserve_exact(capacity as usize);
+        for i in capacity..2*capacity {
+            self.nodes.push(ItemNode {
+                item: None,
+                next_index: i + 1,
+                generation: 0,
+                name: String::from(EMPTY_NODE_STR)
+            });
         }
-        self.nodes = new_nodes;
     }
 
     pub fn size(&self) -> u32 {
@@ -208,80 +131,68 @@ impl<T> Storage<T> where T: Resource {
         self.nodes.capacity() as u32
     }
 
-    pub fn insert(&mut self, name: &str, item: T) -> (&T, ResourceID<T>) {
+    pub fn insert(&mut self, name: &str, item: T) -> ResourceID<T> {
         if self.first_available == self.capacity() {
             self.expand();
         }
         let new_index = self.first_available;
-        
-        unsafe {
-            let node = self.get_node_mut(new_index);
-            self.first_available = (*node).next_index;
 
-            assert!((*node).free);
+        let new_generation = {
+            let node = &mut self.nodes[new_index as usize];
+            self.first_available = node.next_index;
 
-            std::ptr::write(node, ItemNode {
-                item: item,
-                next_index: (*node).next_index,
-                generation: (*node).generation + 1,
-                free: false,
-                name: name.to_string()
-            });
+            assert!(node.item.is_none());
 
-            self.name_mappings.insert(name.to_string(), new_index);
+            node.item = Some(item);
+            node.generation += 1;
+            node.name = name.to_string();
 
-            let node_ref = ResourceID {
-                index: new_index,
-                generation: (*node).generation,
-                tid: 0,
-                phantom: PhantomData
-            };
+            node.generation
+        };
 
-            self.size += 1;
+        self.name_mappings.insert(name.to_string(), new_index);
 
-            return (&(*node).item, node_ref);
-        }
+        let node_ref = ResourceID {
+            index: new_index,
+            generation: new_generation,
+            tid: T::tid(),
+            phantom: PhantomData
+        };
+
+        self.size += 1;
+
+        node_ref
     }
 
     pub fn has(&self, item_ref: ResourceID<T>) -> bool {
-        unsafe {
-            let node = self.get_node(item_ref.index);
-            return !(*node).free && (*node).generation == item_ref.generation;
-        }
+        let node = &self.nodes[item_ref.index as usize];
+        node.item.is_some() && node.generation == item_ref.generation
     }
     
     pub fn get(&self, item_ref: ResourceID<T>) -> &T {
-        unsafe {
-            let node = self.get_node(item_ref.index);
-            assert!(!(*node).free);
-            assert!((*node).generation == item_ref.generation);
-
-            return &((*node).item);
-        }
+        let node = &self.nodes[item_ref.index as usize];
+        assert!(node.item.is_some());
+        assert_eq!(node.generation, item_ref.generation);
+        node.item.as_ref().unwrap()
     }
 
     pub fn get_mut(&mut self, item_ref: ResourceID<T>) -> &mut T {
-        unsafe {
-            let mut node = self.get_node_mut(item_ref.index);
-            assert!(!(*node).free);
-            assert!((*node).generation == item_ref.generation);
-
-            return &mut ((*node).item);
-        }
+        let node = &mut self.nodes[item_ref.index as usize];
+        assert!(node.item.is_some());
+        assert_eq!(node.generation, item_ref.generation);
+        node.item.as_mut().unwrap()
     }
 
     pub fn get_by_name(&self, name: &str) -> Option<(&T, ResourceID<T>)> {
         self.name_mappings.get(name).map(|index| {
-            unsafe {
-                let node = self.get_node(*index);
-                assert!(!(*node).free);
-                return (&((*node).item), ResourceID {
-                    index: *index,
-                    generation: (*node).generation,
-                    tid: 0,
-                    phantom: PhantomData
-                });
-            }
+            let node = &self.nodes[*index as usize];
+            assert!(node.item.is_some());
+            (node.item.as_ref().unwrap(), ResourceID {
+                index: *index,
+                generation: node.generation,
+                tid: T::tid(),
+                phantom: PhantomData
+            })
         })
     }
 
@@ -290,31 +201,25 @@ impl<T> Storage<T> where T: Resource {
             Some(index) => *index,
             None => { return None; }
         };
-        unsafe {
-            let mut node = self.get_node_mut(index);
-            assert!(!(*node).free);
-            return Some((&mut ((*node).item), ResourceID {
-                index: index,
-                generation: (*node).generation,
-                tid: 0,
-                phantom: PhantomData
-            }));
-        }
+        let node = &mut self.nodes[index as usize];
+        assert!(node.item.is_some());
+        Some((node.item.as_mut().unwrap(), ResourceID {
+            index,
+            generation: node.generation,
+            tid: T::tid(),
+            phantom: PhantomData
+        }))
     }
 
     pub fn release(&mut self, item_ref: ResourceID<T>) {
-        let name = unsafe {
-            let node = self.get_node_mut(item_ref.index);
-            assert!(!(*node).free);
-            (*node).free = true;
+        let node = &mut self.nodes[item_ref.index as usize];
+        assert!(node.item.is_some());
+        node.item = None;
+        node.next_index = self.first_available;
 
-            (*node).next_index = self.first_available;
-            self.first_available = item_ref.index;
-
-            &(*node).name
-        };
+        self.first_available = item_ref.index;
         self.size -= 1;
-        self.name_mappings.remove(name);
+        self.name_mappings.remove(&node.name);
     }
 
     pub fn release_by_name(&mut self, name: &str) {
@@ -324,50 +229,21 @@ impl<T> Storage<T> where T: Resource {
             None => { return; } // TODO: report error instead of failing silently...
         };
 
-        let name = unsafe {
-            let node = self.get_node_mut(index);
-            assert!(!(*node).free);
-            (*node).free = true;
+        let node = &mut self.nodes[index as usize];
+        assert!(node.item.is_some());
+        node.item = None;
+        node.next_index = self.first_available;
 
-            (*node).next_index = self.first_available;
-            self.first_available = index;
-
-            &(*node).name
-        };
+        self.first_available = index;
         self.size -= 1;
         self.name_mappings.remove(name);
     }
 
     pub fn iterate<F>(&self, fun: F) where F : Fn(&T) -> () {
         for i in 0..self.capacity() {
-            unsafe {
-                let node = self.get_node(i);
-                if !(*node).free {
-                    fun(&(*node).item);
-                }
-            }
-        }
-    }
-    
-    // Helper methods to get ith node pointer
-    
-    unsafe fn get_node(&self, index: u32) -> *const ItemNode<T> {
-        self.nodes.as_ptr().offset(index as isize)
-    }
-
-    unsafe fn get_node_mut(&mut self, index: u32) -> *mut ItemNode<T> {
-        self.nodes.as_mut_ptr().offset(index as isize)
-    }
-}
-
-impl<T> Drop for Storage<T> where T: Resource {
-    fn drop(&mut self) {
-        unsafe {
-            for i in 0..self.capacity() {
-                let node = self.get_node_mut(i);
-                if !(*node).free {
-                    std::ptr::drop_in_place(node);
-                }
+            let node = &self.nodes[i as usize];
+            if node.item.is_some() {
+                fun(node.item.as_ref().unwrap())
             }
         }
     }
@@ -398,32 +274,15 @@ mod tests {
     }
 
     #[test]
-    fn test_storage_insert() {
+    fn test_storage_insert_get() {
         let mut storage = Storage::new(8);
         
-        let (alice, alice_ref) = storage.insert("alice", (1, 3.0, "Alice".to_string()));
-        assert_eq!(*alice, (1, 3.0, "Alice".to_string()));
-    }
-
-    #[test]
-    fn test_storage_get() {
-        let mut storage = Storage::new(8);
-        
-        let alice_ref = {
-            let (alice, alice_ref) = storage.insert("alice", (1, 3.0, "Alice".to_string()));
-            alice_ref
-        };
+        let alice_ref = storage.insert("alice", (1, 3.0, "Alice".to_string()));
 
         assert_eq!(*storage.get(alice_ref), (1, 3.0, "Alice".to_string()));
-        assert_eq!(*storage.get_by_name("alice").unwrap(), (1, 3.0, "Alice".to_string()));
-        {
-            let temp_ref = storage.get_ref_by_name("alice").unwrap();
-            assert_eq!(temp_ref.index, alice_ref.index);
-            assert_eq!(temp_ref.generation, alice_ref.generation);
-            assert_eq!(temp_ref.tid, alice_ref.tid);
-        }
+        assert_eq!(*storage.get_by_name("alice").unwrap().0, (1, 3.0, "Alice".to_string()));
+
         assert!(storage.get_by_name("bob").is_none());
-        assert!(storage.get_ref_by_name("bob").is_none());
     }
 
     #[test]
@@ -431,10 +290,7 @@ mod tests {
     fn test_storage_get_panic() {
         let mut storage = Storage::new(8);
 
-        let alice_ref = {
-            let (alice, alice_ref) = storage.insert("alice", (1, 3.0, "Alice".to_string()));
-            alice_ref
-        };
+        let alice_ref = storage.insert("alice", (1, 3.0, "Alice".to_string()));
 
         let invalid_ref = ResourceID::<TestData1> {
             index: 3,
@@ -450,10 +306,7 @@ mod tests {
     fn test_storage_has() {
         let mut storage = Storage::new(8);
         
-        let alice_ref = {
-            let (alice, alice_ref) = storage.insert("alice", (1, 3.0, "Alice".to_string()));
-            alice_ref
-        };
+        let alice_ref = storage.insert("alice", (1, 3.0, "Alice".to_string()));
 
         assert!(storage.has(alice_ref));
     }
@@ -462,7 +315,7 @@ mod tests {
     fn test_storage_size() {
         let mut storage = Storage::new(8);
 
-        assert_eq!(storage.size(), 0);pub const NULL: ResourceID<T> =
+        assert_eq!(storage.size(), 0);
         storage.insert("alice", (1, 1.0, "Alice".to_string()));
         assert_eq!(storage.size(), 1);
         storage.insert("bob", (2, 2.0, "Bob".to_string()));
@@ -475,15 +328,8 @@ mod tests {
     fn test_storage_release() {
         let mut storage = Storage::<TestData1>::new(8);
 
-        let alice_ref = {
-            let (alice, alice_ref) = storage.insert("alice", (1, 3.0, "Alice".to_string()));
-            alice_ref
-        };
-
-        let bob_ref = {
-            let (bob, bob_ref) = storage.insert("bob", (2, 4.0, "Bob".to_string()));
-            bob_ref
-        };
+        let alice_ref = storage.insert("alice", (1, 3.0, "Alice".to_string()));
+        let bob_ref = storage.insert("bob", (2, 4.0, "Bob".to_string()));
 
         storage.release(alice_ref);
         assert_eq!(storage.get_by_name("alice"), None);
@@ -536,7 +382,7 @@ mod tests {
         vec.dedup();
 
         for i in &vec {
-            println!("Releasing item {}", i);
+            // println!("Releasing item {}", i);
             storage.release_by_name(&i.to_string());
         }
         let removed_size = vec.len() as u32;
