@@ -15,6 +15,8 @@ pub struct Texture {
     filter_min: GLint,
     filter_max: GLint,
 
+    path: String,
+
     data: Vec<u8>
 }
 
@@ -81,6 +83,7 @@ impl TextureBuilder {
             internal_format: self.internal_format, image_format: self.image_format,
             wrap_s: self.wrap_s, wrap_t: self.wrap_t,
             filter_min: self.filter_min, filter_max: self.filter_max,
+            path: String::new(), // TODO
             data: self.data
         }
     }

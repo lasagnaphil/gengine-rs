@@ -35,6 +35,7 @@ mod canvas;
 mod resource_tids;
 mod sprite;
 mod input_manager;
+mod asset_manager;
 
 #[cfg(not(use_gl_crate))]
 mod gl;

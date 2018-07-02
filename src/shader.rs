@@ -12,8 +12,8 @@ use cgmath::{Matrix4, Vector3};
 use cgmath::prelude::*;
 
 pub struct Shader {
-    vertex_path: String,
-    fragment_path: String,
+    pub vertex_path: String,
+    pub fragment_path: String,
     program: GLuint
 }
 
