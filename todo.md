@@ -1,7 +1,9 @@
 # Things to do
 
-- Finish entity system
-- Tilemap functionality
-- Developer UI via IMGUI
-- Simple UI functionality (Text/Button/...)
-- Asset Manager
+- [x] Sprite rendering
+- [x] Input manager
+- [x] Tilemap functionality
+- [ ] Entity system
+- [ ] Asset Manager
+- [ ] Developer UI via IMGUI
+- [ ] Simple UI functionality (Text/Button/...)
