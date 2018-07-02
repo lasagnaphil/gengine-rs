@@ -72,11 +72,12 @@ impl<'a> SpriteRenderer<'a> {
     pub fn draw_sprite_with_shader(&self,
                                    shader_id: ResourceID<Shader>,
                                    sprite_id: ResourceID<SpriteData>,
-                                   pos: Vector2<f32>, size: Vector2<f32>, rotate: GLfloat,
+                                   pos: Vector2<f32>, scale: Vector2<f32>, rotate: f32,
                                    color: Vector3<f32>) {
         let shader = self.shaders.get(shader_id);
         let sprite = self.sprites.get(sprite_id);
         let texture = self.textures.get(sprite.texture);
+        let size = Vector2::new(scale.x * texture.width as f32, scale.y * texture.height as f32);
 
         // change uv coordinate buffer before drawing sprite
         let uvs = sprite.get_uvs(texture.width as u32, texture.height as u32);
@@ -119,9 +120,15 @@ impl<'a> SpriteRenderer<'a> {
     // Draw sprite with default shader
     pub fn draw_sprite(&self,
                        sprite_id: ResourceID<SpriteData>,
-                       pos: Vector2<f32>, size: Vector2<f32>, rotate: GLfloat,
+                       pos: Vector2<f32>, scale: Vector2<f32>, rotate: f32,
                        color: Vector3<f32>) {
 
-        self.draw_sprite_with_shader(self.sprite_shader, sprite_id, pos, size, rotate, color);
+        self.draw_sprite_with_shader(self.sprite_shader, sprite_id, pos, scale, rotate, color);
+    }
+
+    pub fn draw_sprite_simple(&self,
+                              sprite_id: ResourceID<SpriteData>,
+                              pos: Vector2<f32>, scale: Vector2<f32>) {
+        self.draw_sprite(sprite_id, pos, scale, 0.0, Vector3::new(0.0, 0.0, 0.0));
     }
 }

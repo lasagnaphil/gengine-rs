@@ -206,7 +206,7 @@ fn main() {
         sprite_renderer.draw_sprite(
             sprite_id,
             Vector2::new(x, y),
-            Vector2::new(64.0, 64.0),
+            Vector2::new(0.25, 0.25),
             0.0,
             Vector3::new(0.0, 1.0, 0.0)
         );
