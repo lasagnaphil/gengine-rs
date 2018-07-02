@@ -5,6 +5,8 @@ authors = ["Phillip Chang <lasagnaphil@snu.ac.kr>"]
 
 [dependencies]
 gl = { path = "lib/gl" }
+wren = { git = "https://github.com/lasagnaphil/wren-rust" }
+lazy_static = "1.0"
 libc = "0.2"
 cgmath = "0.16.0"
 stb_image = "0.2.2"

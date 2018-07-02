@@ -5,6 +5,8 @@
 
 #[macro_use]
 extern crate derivative;
+#[macro_use]
+extern crate lazy_static;
 
 extern crate sdl2;
 extern crate cgmath;
@@ -19,6 +21,9 @@ extern crate serde_derive;
 extern crate serde;
 extern crate toml;
 extern crate serde_json;
+
+#[macro_use]
+extern crate wren;
 
 #[macro_use] mod big_array;
 
@@ -36,7 +41,7 @@ mod gl;
 
 use shader::Shader;
 use texture::{Texture, TextureBuilder};
-use storage::Storage;
+use storage::{Storage, ResourceID};
 use sprite_renderer::SpriteRenderer;
 use canvas::{Canvas, TileMap};
 use sprite::{SpriteData, SpriteBounds};
@@ -50,7 +55,29 @@ use stb_image::image;
 use cgmath::{Vector2, Vector3};
 
 use std::time::Duration;
+use std::collections::HashMap;
 use input_manager::{InputManager, Key};
+
+/*
+struct App<'a> {
+    sdl_context: Sdl,
+    video_subsystem: VideoSubsystem,
+    window: sdl2::Window,
+
+    sprites: Storage<SpriteData>,
+    textures: Storage<Texture>,
+    shaders: Storage<Shader>,
+    tilemaps: Storage<TileMap>,
+
+    sprite_renderer: SpriteRenderer<'a>,
+    event_pump: sdl2::EventPump,
+    input_manager: InputManager,
+
+    test_tex_ref: ResourceID<Texture>,
+    spritesheet_tex_ref: ResourceID<Texture>,
+    sprite_id: ResourceID<SpriteData>,
+}
+*/
 
 fn find_sdl_gl_driver() -> Option<u32> {
     for (index, item) in sdl2::render::drivers().enumerate() {
@@ -82,6 +109,27 @@ fn save_file(filename: &str, content: &[u8]) {
     use std::io::Write;
     let mut f = std::fs::File::create(filename).unwrap();
     f.write_all(content);
+}
+
+lazy_static! {
+    static ref FOREIGN_METHODS: HashMap<&'static str, wren::ForeignMethodFn> = {
+        let mut map = HashMap::new();
+        map
+    };
+}
+
+lazy_static! {
+    static ref FOREIGN_CLASSES: HashMap<&'static str, wren::ForeignClassMethods> = {
+        let mut map = HashMap::new();
+        /*
+        let mut vec3_class_methods = wren::ForeignClassMethods::new();
+        vec3_class_methods.set_allocate_fn(wren_foreign_method_fn!(vec3_allocate));
+        vec3_class_methods.set_finalize_fn(wren_finalizer_fn!(vec3_finalize));
+
+        map.insert("vectorVec3", vec3_class_methods);
+        */
+        map
+    };
 }
 
 fn main() {
@@ -160,6 +208,55 @@ fn main() {
         texture: test_tex_ref,
         rect: SpriteBounds::new(64, 64, 384, 384, 0, 0)
     });
+
+    // Load Wren VM
+    fn bind_method(_: &mut wren::VM,
+                   module: &str,
+                   class_name: &str,
+                   is_static: bool,
+                   signature: &str) -> wren::ForeignMethodFn {
+        let full_signature = format!("{}{}{}{}",
+                                     module,
+                                     class_name,
+                                     signature,
+                                     if is_static { "s" } else { "" });
+        *FOREIGN_METHODS.get::<str>(&full_signature).unwrap_or(&None)
+    }
+
+    fn bind_class(_: &mut wren::VM,
+                  module: &str,
+                  class_name: &str) -> wren::ForeignClassMethods {
+        let full_signature = format!("{}{}", module, class_name);
+        let methods = FOREIGN_CLASSES.get::<str>(&full_signature);
+        if let Some(methods) = methods {
+            return *methods;
+        }
+        panic!("Failed to bind foreign class");
+    }
+
+    fn load_module(_: &mut wren::VM, name: &str) -> Option<String> {
+        use std::path::Path;
+        use std::fs::File;
+        use std::io::Read;
+
+        let mut path = Path::new("scripts").join(&name);
+        path.set_extension("wren");
+        let mut buffer = String::new();
+        if File::open(path)
+            .map(|mut f| f.read_to_string(&mut buffer))
+            .is_ok() {
+            Some(buffer)
+        } else {
+            None
+        }
+    }
+
+    let mut wren_cfg = wren::Configuration::new();
+    wren_cfg.set_bind_foreign_method_fn(wren_bind_foreign_method_fn!(bind_method));
+    wren_cfg.set_bind_foreign_class_fn(wren_bind_foreign_class_fn!(bind_class));
+    wren_cfg.set_load_module_fn(wren_load_module_fn!(load_module));
+    let mut vm = wren::VM::new(wren_cfg);
+    // vm.interpret(source);
 
     let sprite_renderer = SpriteRenderer::new(&shaders, &textures, &sprites);
     let canvas = Canvas::from_file(&sprites, &textures, &shaders, shader_id, "map_test.json");
