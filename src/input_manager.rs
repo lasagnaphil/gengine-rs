@@ -19,22 +19,23 @@ struct InputState {
     mouse_position: (i32, i32),
 }
 
-pub struct InputManager<'a> {
-    event_pump: &'a EventPump,
-
+pub struct InputManager {
     keybindings: HashMap<Scancode, Key>,
     cur_input_state: InputState,
     prev_input_state: InputState
 }
 
 
-impl<'a> InputManager<'a> {
-    pub fn new(event_pump: &'a EventPump) -> Self {
+impl InputManager {
+    pub fn new() -> Self {
+        let mut keybindings = HashMap::new();
+        keybindings.insert(Scancode::Up, Key::Up);
+        keybindings.insert(Scancode::Left, Key::Left);
+        keybindings.insert(Scancode::Down, Key::Down);
+        keybindings.insert(Scancode::Right, Key::Right);
+
         InputManager {
-            event_pump,
-
-            keybindings: HashMap::new(),
-
+            keybindings,
             cur_input_state: InputState {
                 keys_down: HashSet::new(),
                 mouse_buttons_down: HashSet::new(),
@@ -48,12 +49,12 @@ impl<'a> InputManager<'a> {
         }
     }
 
-    pub fn update(&mut self) {
-        let keys_down = self.event_pump.keyboard_state()
+    pub fn update(&mut self, event_pump: &EventPump) {
+        let keys_down = event_pump.keyboard_state()
             .pressed_scancodes()
             .filter_map(|sc| { self.keybindings.get(&sc).map(|k| {*k}) })
             .collect();
-        let mouse_state = self.event_pump.mouse_state();
+        let mouse_state = event_pump.mouse_state();
         let mouse_buttons_down = mouse_state
             .mouse_buttons()
             .filter_map(|(b, p)| if p { Some(b.clone()) } else { None })

@@ -50,6 +50,7 @@ use stb_image::image;
 use cgmath::{Vector2, Vector3};
 
 use std::time::Duration;
+use input_manager::{InputManager, Key};
 
 fn find_sdl_gl_driver() -> Option<u32> {
     for (index, item) in sdl2::render::drivers().enumerate() {
@@ -164,6 +165,8 @@ fn main() {
     let canvas = Canvas::from_file(&sprites, &textures, &shaders, shader_id, "map_test.json");
 
     let mut event_pump = sdl_context.event_pump().unwrap();
+    let mut input_mgr = InputManager::new();
+    let (mut x, mut y) = (100.0f32, 100.0f32);
 
     'running: loop {
 
@@ -177,6 +180,20 @@ fn main() {
         }
 
         // update
+        input_mgr.update(&event_pump);
+
+        if input_mgr.is_key_pressed(Key::Left) {
+            x -= 10.0;
+        }
+        if input_mgr.is_key_pressed(Key::Right) {
+            x += 10.0;
+        }
+        if input_mgr.is_key_pressed(Key::Up) {
+            y -= 10.0;
+        }
+        if input_mgr.is_key_pressed(Key::Down) {
+            y += 10.0;
+        }
 
         // render
         unsafe {
@@ -188,17 +205,9 @@ fn main() {
 
         sprite_renderer.draw_sprite(
             sprite_id,
-            Vector2::new(100.0, 100.0),
-            Vector2::new(200.0, 200.0),
+            Vector2::new(x, y),
+            Vector2::new(64.0, 64.0),
             0.0,
-            Vector3::new(0.0, 1.0, 0.0)
-        );
-
-        sprite_renderer.draw_sprite(
-            sprite_id,
-            Vector2::new(200.0, 200.0),
-            Vector2::new(300.0, 400.0),
-            45.0,
             Vector3::new(0.0, 1.0, 0.0)
         );
 
