@@ -3,6 +3,12 @@ use gl::types::*;
 use stb_image::image::Image;
 use std::os::raw::c_void;
 
+use stb_image::image;
+use serde::{Serialize, Deserialize};
+
+use path::*;
+
+#[derive(Serialize, Deserialize)]
 pub struct Texture {
     id: GLuint,
     pub width: GLint,
@@ -17,6 +23,7 @@ pub struct Texture {
 
     path: String,
 
+    #[serde(skip)]
     data: Vec<u8>
 }
 
@@ -31,6 +38,8 @@ pub struct TextureBuilder {
     filter_min: GLint,
     filter_max: GLint,
 
+    path: String,
+
     data: Vec<u8>
 }
 
@@ -41,8 +50,22 @@ impl TextureBuilder {
             internal_format: gl::RGB as GLint, image_format: gl::RGB,
             wrap_s: gl::REPEAT as GLint, wrap_t: gl::REPEAT as GLint,
             filter_min: gl::LINEAR as GLint, filter_max: gl::LINEAR as GLint,
+            path: String::new(),
             data: Vec::new()
         }
+    }
+
+    pub fn load_file(mut self, filename: &str) -> Self {
+        let image = match image::load(&asset_path(filename)) {
+            image::LoadResult::ImageU8(image) => image,
+            image::LoadResult::ImageF32(_) => { panic!("Image loaded as f32"); }
+            image::LoadResult::Error(s) => { panic!("Error while loading image: {}", s); }
+        };
+        self.path = filename.to_string();
+        self.data = image.data;
+        self.width = image.width as GLint;
+        self.height = image.height as GLint;
+        self
     }
 
     pub fn image(mut self, image: Image<u8>) -> Self {
@@ -83,7 +106,7 @@ impl TextureBuilder {
             internal_format: self.internal_format, image_format: self.image_format,
             wrap_s: self.wrap_s, wrap_t: self.wrap_t,
             filter_min: self.filter_min, filter_max: self.filter_max,
-            path: String::new(), // TODO
+            path: self.path,
             data: self.data
         }
     }
@@ -93,6 +116,30 @@ impl Texture {
     pub fn bind(&self) {
         unsafe {
             gl::BindTexture(gl::TEXTURE_2D, self.id);
+        }
+    }
+
+    pub fn load(&mut self) {
+        let image = match image::load(&asset_path(&self.path)) {
+            image::LoadResult::ImageU8(image) => image,
+            image::LoadResult::ImageF32(_) => { panic!("Image loaded as f32"); }
+            image::LoadResult::Error(s) => { panic!("Error while loading image: {}", s); }
+        };
+
+        self.data = image.data;
+        self.width = image.width as GLint;
+        self.height = image.height as GLint;
+
+        unsafe {
+            gl::GenTextures(1, &mut self.id);
+            gl::BindTexture(gl::TEXTURE_2D, self.id);
+
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, self.wrap_s);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, self.wrap_s);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, self.filter_min);
+            gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, self.filter_max);
+
+            gl::TexImage2D(gl::TEXTURE_2D, 0, self.internal_format, self.width, self.height, 0, self.image_format, gl::UNSIGNED_BYTE, self.data.as_mut_ptr() as *mut c_void);
         }
     }
 }

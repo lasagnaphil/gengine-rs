@@ -36,6 +36,8 @@ mod resource_tids;
 mod sprite;
 mod input_manager;
 mod asset_manager;
+mod game_data;
+mod path;
 
 #[cfg(not(use_gl_crate))]
 mod gl;
@@ -44,8 +46,11 @@ use shader::Shader;
 use texture::{Texture, TextureBuilder};
 use storage::{Storage, ResourceID};
 use sprite_renderer::SpriteRenderer;
-use canvas::{Canvas, TileMap};
+use canvas::Canvas;
 use sprite::{SpriteData, SpriteBounds};
+use input_manager::{InputManager, Key};
+use game_data::GameData;
+use path::{asset_path, storage_path};
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -57,18 +62,12 @@ use cgmath::{Vector2, Vector3};
 
 use std::time::Duration;
 use std::collections::HashMap;
-use input_manager::{InputManager, Key};
 
 /*
 struct App<'a> {
     sdl_context: Sdl,
     video_subsystem: VideoSubsystem,
     window: sdl2::Window,
-
-    sprites: Storage<SpriteData>,
-    textures: Storage<Texture>,
-    shaders: Storage<Shader>,
-    tilemaps: Storage<TileMap>,
 
     sprite_renderer: SpriteRenderer<'a>,
     event_pump: sdl2::EventPump,
@@ -89,28 +88,6 @@ fn find_sdl_gl_driver() -> Option<u32> {
     None
 }
 
-fn load_image(filename: &str) -> image::Image<u8> {
-    match image::load(filename) {
-        image::LoadResult::ImageU8(image) => image,
-        image::LoadResult::ImageF32(_) => { panic!("Image loaded as f32"); }
-        image::LoadResult::Error(s) => { panic!("Error while loading image: {}", s); }
-    }
-}
-
-fn load_file(filename: &str) -> String {
-    use std::io::Read;
-    let mut file = std::fs::File::open(filename)
-        .expect("file not found");
-    let mut contents = String::new();
-    file.read_to_string(&mut contents);
-    contents
-}
-
-fn save_file(filename: &str, content: &[u8]) {
-    use std::io::Write;
-    let mut f = std::fs::File::create(filename).unwrap();
-    f.write_all(content);
-}
 
 lazy_static! {
     static ref FOREIGN_METHODS: HashMap<&'static str, wren::ForeignMethodFn> = {
@@ -132,6 +109,7 @@ lazy_static! {
         map
     };
 }
+
 
 fn main() {
     let sdl_context = sdl2::init().unwrap();
@@ -158,57 +136,59 @@ fn main() {
     debug_assert_eq!(gl_attr.context_profile(), GLProfile::Core);
     debug_assert_eq!(gl_attr.context_version(), (3, 3));
 
-    let mut sprites = Storage::<SpriteData>::new(16);
-    let mut textures = Storage::<Texture>::new(16);
-    let mut shaders = Storage::<Shader>::new(16);
-    let mut tilemaps = Storage::<TileMap>::new(4);
-
-    let assets = find_folder::Search::ParentsThenKids(3, 3)
-        .for_folder("assets").unwrap();
+    /*
+    let mut game_data = GameData::create_new();
 
     // Load shaders
-    let shader = Shader::compile(
-        assets.join("sprite.vert").to_str().unwrap(),
-        assets.join("sprite.frag").to_str().unwrap()
-    );
-    let projection_mat = cgmath::ortho(0.0, 800.0, 600.0, 0.0, -1.0, 1.0);
-    shader.use_shader();
-    shader.set_int("image", 0);
-    shader.set_mat4("projection", projection_mat);
-    let shader_id = shaders.insert("sprite.shader", shader);
+    let mut shader = Shader::new("sprite.vert".to_string(), "sprite.frag".to_string());
+    shader.compile();
+    let shader_id = game_data.shaders.insert("sprite.shader", shader);
 
     // Load textures
-    let test_image = load_image(assets.join("awesomeface.png").to_str().unwrap());
     let test_tex = TextureBuilder::new()
+        .load_file("awesomeface.png")
         .image_format(gl::RGBA)
         .internal_format(gl::RGBA)
-        .image(test_image)
         .build();
-    let test_tex_ref = textures.insert("awesomeface.texture", test_tex);
+    let test_tex_ref = game_data.textures.insert("awesomeface.texture", test_tex);
 
-    let spritesheet_image = load_image(assets.join("kenneyrpgpack/Spritesheet/RPGpack_sheet.png").to_str().unwrap());
     let spritesheet_tex = TextureBuilder::new()
+        .load_file("kenneyrpgpack/Spritesheet/RPGpack_sheet.png")
         .image_format(gl::RGBA)
         .internal_format(gl::RGBA)
-        .image(spritesheet_image)
         .build();
-    let spritesheet_tex_ref = textures.insert("rpgpack.texture", spritesheet_tex);
+    let spritesheet_tex_ref = game_data.textures.insert("rpgpack.texture", spritesheet_tex);
 
     // Load sprites
     for i in 0..9 {
         let name = format!("grass_with_dirt_{}", i+1);
-        sprites.insert(&name, SpriteData {
+        game_data.sprites.insert(&name, SpriteData {
             name: name.clone(),
             texture: spritesheet_tex_ref,
             rect: SpriteBounds::new((i % 3) * 64, (i / 3) * 64, 64, 64, 0, 0)
         });
     }
 
-    let sprite_id = sprites.insert("smiley_face", SpriteData {
+    let sprite_id = game_data.sprites.insert("smiley_face.sprite", SpriteData {
         name: "smiley_face".to_string(),
         texture: test_tex_ref,
         rect: SpriteBounds::new(64, 64, 384, 384, 0, 0)
     });
+
+    game_data.save();
+    */
+
+    let mut game_data = GameData::from_file();
+
+    let (shader, shader_id) = game_data.shaders.get_by_name("sprite.shader").unwrap();
+    let projection_mat = cgmath::ortho(0.0, 800.0, 600.0, 0.0, -1.0, 1.0);
+    shader.use_shader();
+    shader.set_int("image", 0);
+    shader.set_mat4("projection", projection_mat);
+
+    let (_, test_tex_ref) = game_data.textures.get_by_name("awesomeface.texture").unwrap();
+    let (_, spritesheet_tex_ref) = game_data.textures.get_by_name("rpgpack.texture").unwrap();
+    let (_, sprite_id) = game_data.sprites.get_by_name("smiley_face.sprite").unwrap();
 
     // Load Wren VM
     fn bind_method(_: &mut wren::VM,
@@ -259,8 +239,8 @@ fn main() {
     let mut vm = wren::VM::new(wren_cfg);
     // vm.interpret(source);
 
-    let sprite_renderer = SpriteRenderer::new(&shaders, &textures, &sprites);
-    let canvas = Canvas::from_file(&sprites, &textures, &shaders, shader_id, "map_test.json");
+    let sprite_renderer = SpriteRenderer::new(&game_data.shaders, &game_data.textures, &game_data.sprites);
+    let canvas = Canvas::from_file(&game_data.sprites, &game_data.textures, &game_data.shaders, shader_id, "map_test.json");
 
     let mut event_pump = sdl_context.event_pump().unwrap();
     let mut input_mgr = InputManager::new();

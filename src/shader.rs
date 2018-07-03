@@ -1,7 +1,6 @@
 use std::ffi::CString;
 use std::ptr;
 use std::str;
-
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -11,10 +10,16 @@ use gl::types::*;
 use cgmath::{Matrix4, Vector3};
 use cgmath::prelude::*;
 
+use serde::{Serialize, Deserialize};
+
+use path::*;
+
+#[derive(Serialize, Deserialize)]
 pub struct Shader {
     pub vertex_path: String,
     pub fragment_path: String,
-    program: GLuint
+    program: GLuint,
+    loaded: bool
 }
 
 fn to_cstring(source: &str) -> CString {
@@ -44,20 +49,28 @@ fn compile_shader(shader_type: GLenum, source: &str) -> GLuint {
 }
 
 impl Shader {
-    pub fn compile(vertex_path: &str, fragment_path: &str) -> Self {
+    pub fn new(vertex_path: String, fragment_path: String) -> Self {
+        Shader {
+            vertex_path,
+            fragment_path,
+            program: 0,
+            loaded: false
+        }
+    }
+    pub fn compile(&mut self) {
         let program = unsafe { gl::CreateProgram() };
 
-        let mut vertex_file = File::open(vertex_path)
-            .expect(&format!("Vertex shader {} not found", vertex_path));
+        let mut vertex_file = File::open(&asset_path(&self.vertex_path))
+            .expect(&format!("Vertex shader {} not found", &self.vertex_path));
         let mut vertex_code = String::new();
         vertex_file.read_to_string(&mut vertex_code)
-            .expect(&format!("Something went wrong reading the vertex shader {}", vertex_path));
-        let mut fragment_file = File::open(fragment_path)
-            .expect(&format!("Fragment shader {} not found", fragment_path));
+            .expect(&format!("Something went wrong reading the vertex shader {}", &self.vertex_path));
+        let mut fragment_file = File::open(&asset_path(&self.fragment_path))
+            .expect(&format!("Fragment shader {} not found", &self.fragment_path));
         let mut fragment_code = String::new();
         fragment_file.read_to_string(&mut fragment_code)
-            .expect(&format!("Something went wrong reading the fragment shader {}", fragment_path));
-        
+            .expect(&format!("Something went wrong reading the fragment shader {}", &self.fragment_path));
+
         unsafe {
             let vertex_shader_id = compile_shader(gl::VERTEX_SHADER, &vertex_code);
             let fragment_shader_id = compile_shader(gl::FRAGMENT_SHADER, &fragment_code);
@@ -75,11 +88,8 @@ impl Shader {
             gl::DeleteShader(fragment_shader_id);
         }
 
-        Shader {
-            vertex_path: vertex_path.to_string(),
-            fragment_path: fragment_path.to_string(),
-            program: program,
-        }
+        self.program = program;
+        self.loaded = true;
     }
 
     pub fn use_shader(&self) {
