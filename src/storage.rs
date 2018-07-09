@@ -243,6 +243,15 @@ impl<T> Storage<T> where T: Resource {
             }
         }
     }
+
+    pub fn iterate_mut<F>(&mut self, fun: F) where F : Fn(&mut T) -> () {
+        for i in 0..self.capacity() {
+            let node = &mut self.nodes[i as usize];
+            if node.item.is_some() {
+                fun(node.item.as_mut().unwrap())
+            }
+        }
+    }
 }
 
 #[cfg(test)]

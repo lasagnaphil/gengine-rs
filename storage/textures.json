@@ -1,0 +1,128 @@
+{
+  "nodes": [
+    {
+      "item": {
+        "id": 1,
+        "width": 512,
+        "height": 512,
+        "internal_format": 6408,
+        "image_format": 6408,
+        "wrap_s": 10497,
+        "wrap_t": 10497,
+        "filter_min": 9729,
+        "filter_max": 9729,
+        "path": "awesomeface.png"
+      },
+      "next_index": 1,
+      "generation": 1,
+      "name": "awesomeface.texture"
+    },
+    {
+      "item": {
+        "id": 2,
+        "width": 1280,
+        "height": 832,
+        "internal_format": 6408,
+        "image_format": 6408,
+        "wrap_s": 10497,
+        "wrap_t": 10497,
+        "filter_min": 9729,
+        "filter_max": 9729,
+        "path": "kenneyrpgpack/Spritesheet/RPGpack_sheet.png"
+      },
+      "next_index": 2,
+      "generation": 1,
+      "name": "rpgpack.texture"
+    },
+    {
+      "item": null,
+      "next_index": 3,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 4,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 5,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 6,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 7,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 8,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 9,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 10,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 11,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 12,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 13,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 14,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 15,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 16,
+      "generation": 0,
+      "name": "<empty>"
+    }
+  ],
+  "size": 2,
+  "first_available": 2,
+  "name_mappings": {
+    "awesomeface.texture": 0,
+    "rpgpack.texture": 1
+  }
+}

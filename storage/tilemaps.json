@@ -1,0 +1,31 @@
+{
+  "nodes": [
+    {
+      "item": null,
+      "next_index": 1,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 2,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 3,
+      "generation": 0,
+      "name": "<empty>"
+    },
+    {
+      "item": null,
+      "next_index": 4,
+      "generation": 0,
+      "name": "<empty>"
+    }
+  ],
+  "size": 0,
+  "first_available": 0,
+  "name_mappings": {}
+}

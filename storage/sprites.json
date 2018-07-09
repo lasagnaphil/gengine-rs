@@ -168,7 +168,7 @@
       },
       "next_index": 10,
       "generation": 1,
-      "name": "smiley_face"
+      "name": "smiley_face.sprite"
     },
     {
       "item": null,
@@ -211,14 +211,14 @@
   "first_available": 10,
   "name_mappings": {
     "grass_with_dirt_1": 0,
-    "grass_with_dirt_3": 2,
-    "grass_with_dirt_4": 3,
-    "grass_with_dirt_5": 4,
-    "grass_with_dirt_6": 5,
-    "grass_with_dirt_7": 6,
-    "grass_with_dirt_8": 7,
+    "smiley_face.sprite": 9,
+    "grass_with_dirt_2": 1,
     "grass_with_dirt_9": 8,
-    "smiley_face": 9,
-    "grass_with_dirt_2": 1
+    "grass_with_dirt_5": 4,
+    "grass_with_dirt_4": 3,
+    "grass_with_dirt_8": 7,
+    "grass_with_dirt_3": 2,
+    "grass_with_dirt_7": 6,
+    "grass_with_dirt_6": 5
   }
 }

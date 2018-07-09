@@ -24,23 +24,12 @@ use shader::Shader;
 use texture::Texture;
 use sprite::{SpriteBounds, SpriteData};
 
-
-pub struct TileMap {
-    name: String,
-    sprites: ResourceID<SpriteData>,
-    texture: ResourceID<Texture>
-}
+use path::*;
 
 pub const MAX_LAYERS: usize = 4;
 pub const MAX_WIDTH: usize = 64;
 pub const MAX_HEIGHT: usize = 64;
 pub const SCALE: f32 = 64.0;
-
-#[derive(Serialize, Deserialize)]
-struct TileMapLayerData(
-    #[serde(with = "BigArray")]
-    [ResourceID<SpriteData>; MAX_WIDTH * MAX_HEIGHT]
-);
 
 big_array! { 4096, }
 
@@ -91,10 +80,7 @@ impl<'a> Canvas<'a> {
                      default_shader: ResourceID<Shader>,
                      filename: &str) -> Self {
 
-        let assets = find_folder::Search::ParentsThenKids(3, 3)
-            .for_folder("assets").unwrap();
-
-        let mut file = File::open(assets.join(filename).to_str().unwrap())
+        let mut file = File::open(asset_path(filename))
             .expect("file not found");
         let mut contents = String::new();
         file.read_to_string(&mut contents)
